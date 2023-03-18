@@ -1,0 +1,54 @@
+@startuml Architecture overview
+title Architecture overview
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/angular.puml
+!include DEVICONS/java.puml
+!include DEVICONS/msql_server.puml
+!include FONTAWESOME/users.puml
+
+' LAYOUT_WITH_LEGEND()
+
+
+System_Boundary(c1, "Microsoft Azure") {
+        ContainerDb(Database, "Database", "")
+
+    System_Boundary(webappSolutionBoundary,"Remix service"){
+        Container(app, "WebApp", "Running in browser", "")
+        Container(remixServer, "Remix server", "", "")
+    }
+    Container_Ext(msal, "Microsoft Authentication Library", "JWT-Token with Roles", "")
+}
+
+Rel(app,remixServer, "HTTP-requests", "Authenticated")
+Rel(msal,app, "", "")
+Rel(app,msal, "", "")
+' Rel(remixServer, Database, "Stores and receive calculation matrix etc", "")
+Rel(remixServer, Xledger, "Request data from", "GraphQL API")
+
+
+Person(admin, "Admin", "")
+Person(manager, "Manager", "")
+Person(employee, "Employee", "")
+
+Rel(manager, app, "Uses", "Browser","Check timesheets for their employees, edit calculation matrix")
+Rel(employee, app, "Uses", "Browser","Check their own timesheet and what they can expect to be paid")
+Rel(admin, app, "Uses", "Browser","Access to all data, edit calculation matrix, edit employee data")
+
+Rel(remixServer, Database, "Read/Write", "SQL")
+
+@enduml
+
+
+' The payment calculation matrix maps the different project tasks to the different payment rules... This can be hardcoded untill we figure out how it works.
+
+' Each employe has the following variables that affect the payment calculation:
+' - Yearly salary ( Normally 600 000 )
+' - Own cost factor ( normally 1.5 )
+' - Provision percentage ( varies the most ) 
+
+' So basicly just the provision percentage is needed to calculate the payment for each employee.
+
+' The rest of the variables are hardcoded in the calculation matrix. And we get the timesheets with the hourly-rates from Xledger.

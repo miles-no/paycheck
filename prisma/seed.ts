@@ -3,40 +3,91 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+export enum Role {
+  admin = "admin",
+  manager = "manager",
+  employee = "employee",
+}
 async function seed() {
-  const email = "rachel@remix.run";
+  //todo: cleanup the existing database
+  // await prisma.user.delete({ where: { email } }).catch(() => {
+  // no worries if it doesn't exist yet
+  // });
 
-  // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
-    // no worries if it doesn't exist yet
+  const [adminRole, managerRole, employee] = await Promise.all([
+    prisma.role.create({
+      data: {
+        name: Role.admin,
+      },
+    }),
+    prisma.role.create({
+      data: {
+        name: Role.manager,
+      },
+    }),
+    prisma.role.create({
+      data: {
+        name: Role.employee,
+      },
+    }),
+  ]);
+
+  const employeeDetails = await prisma.employeeDetails.create({
+    data: {
+      xledgerId: "26839556",
+    },
   });
 
-  const hashedPassword = await bcrypt.hash("racheliscool", 10);
-
-  const user = await prisma.user.create({
+  // Add Henry
+  await prisma.user.create({
     data: {
-      email,
+      email: "henry@miles.no",
       password: {
         create: {
-          hash: hashedPassword,
+          hash: await bcrypt.hash("henrypassword", 10),
         },
       },
+      roleId: employee.id,
+      employeeDetailsId: employeeDetails.id,
     },
   });
 
-  await prisma.note.create({
+  // Admin user
+  await prisma.user.create({
     data: {
-      title: "My first note",
-      body: "Hello, world!",
-      userId: user.id,
+      email: "admin@miles.no",
+      password: {
+        create: {
+          hash: await bcrypt.hash("adminpassword", 10),
+        },
+      },
+      roleId: adminRole.id,
     },
   });
 
-  await prisma.note.create({
+  // Manager user
+  await prisma.user.create({
     data: {
-      title: "My second note",
-      body: "Hello, world!",
-      userId: user.id,
+      email: "manager@miles.no",
+      password: {
+        create: {
+          hash: await bcrypt.hash("managerpassword", 10),
+        },
+      },
+      roleId: managerRole.id,
+    },
+  });
+
+  // Employee user
+  await prisma.user.create({
+    data: {
+      email: "employee@miles.no",
+      password: {
+        create: {
+          hash: await bcrypt.hash("employeepassword", 10),
+        },
+      },
+      roleId: employee.id,
     },
   });
 

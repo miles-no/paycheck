@@ -2,11 +2,15 @@ import type { Password, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
+import { Role } from "../../prisma/seed";
 
 export type { User } from "@prisma/client";
 
 export async function getUserById(id: User["id"]) {
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({
+    where: { id },
+    include: { role: true, employeeDetails: true },
+  });
 }
 
 export async function getUserByEmail(email: User["email"]) {
@@ -15,7 +19,12 @@ export async function getUserByEmail(email: User["email"]) {
 
 export async function createUser(email: User["email"], password: string) {
   const hashedPassword = await bcrypt.hash(password, 10);
-
+  const employeeRole = await prisma.role.findUnique({
+    where: { name: Role.employee },
+  });
+  if (!employeeRole) {
+    throw new Error("Employee role not found");
+  }
   return prisma.user.create({
     data: {
       email,
@@ -24,6 +33,7 @@ export async function createUser(email: User["email"], password: string) {
           hash: hashedPassword,
         },
       },
+      roleId: employeeRole.id,
     },
   });
 }

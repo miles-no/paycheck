@@ -1,8 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // darkMode: "class",
   content: ["./app/**/*.{ts,tsx,jsx,js}"],
   theme: {
-    extend: {},
+    // fontFamily: {
+    //   display: ["Poppins", "sans-serif"],
+    // },
+    transitionProperty: {
+      height: "height",
+    },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };

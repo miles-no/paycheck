@@ -1,0 +1,23 @@
+import { LoaderFunction } from "@remix-run/router";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+
+export const loader: LoaderFunction = async ({params,context,request}) => {
+  const {employeeId,year} = params;
+
+  // Todo: Only the employee with id: employeeId, a manager or admin should be able to see this page
+  
+  return json( {message: `Hello from employee-year-page for employee with id: ${employeeId} and year: ${year}`} );
+};
+
+
+export default function IndexPage() {
+  const {message} = useLoaderData();
+
+  return (
+    <div>
+      <h1>Employee-Year-page</h1>
+      <p>{message}</p>
+    </div>
+  );
+}

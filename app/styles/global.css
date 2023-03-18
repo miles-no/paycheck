@@ -1,0 +1,109 @@
+.focusOnHoveredChild > * {
+    transition: all 0.2s ease-in-out;
+}
+
+.focusOnHoveredChild:hover > * {
+    opacity: 0.5;
+    transform: scale(0.99);
+}
+
+.focusOnHoveredChild:hover > *:hover {
+    opacity: 1;
+    transform: scale(1.02);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
+}
+
+
+a {
+    transition: all 0.2s ease-in-out;
+}
+
+/* underline links that are inside a text element */
+p > a, li > a, h1 > a, h2 > a, h3 > a, h4 > a, h5 > a, h6 > a {
+    text-decoration: underline;
+}
+
+/* Show border around all links when they are hovered */
+a:hover, :focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
+}
+
+
+/*Search button styling*/
+.searchButton {
+    transition: all 0.2s ease-in-out;
+}
+
+.searchButton:hover {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
+}
+
+.searchButton:hover span {
+    display: inline-block;
+}
+
+/**/
+.emptyCell::before {
+    content: "-";
+}
+
+kbd {
+    color: #000;
+    background-color: #fff;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 1.1em;
+    font-family: monospace;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.hashStyle::before {
+    content: "#";
+}
+
+@media print {
+
+    .hideInPrint {
+        display: none;
+    }
+}
+
+body {
+    background-attachment: fixed;
+    --bg-opacity: 0.2;
+    background-image: linear-gradient(
+            130deg,
+            hsl(0deg, 49%, 92%, var(--bg-opacity)) 0%,
+            hsl(330deg, 22%, 82%, var(--bg-opacity)) 21%,
+            hsl(305deg, 15%, 71%, var(--bg-opacity)) 30%,
+            hsl(287deg, 15%, 62%, var(--bg-opacity)) 39%,
+            hsl(277deg, 16%, 54%, var(--bg-opacity)) 46%,
+            hsl(271deg, 20%, 45%, var(--bg-opacity)) 54%,
+            hsl(266deg, 28%, 37%, var(--bg-opacity)) 61%,
+            hsl(261deg, 40%, 30%, var(--bg-opacity)) 69%,
+            hsl(255deg, 59%, 22%, var(--bg-opacity)) 79%,
+            hsl(245deg, 100%, 14%, var(--bg-opacity)) 100%
+    );
+}
+
+/*If prefers dark mode*/
+@media (prefers-color-scheme: dark) {
+    body {
+        background-attachment: fixed;
+        --bg-opacity: 0.1;
+        background-image: linear-gradient(
+                130deg,
+                hsl(0deg, 49%, 92%, var(--bg-opacity)) 0%,
+                hsl(330deg, 22%, 82%, var(--bg-opacity)) 21%,
+                hsl(305deg, 15%, 71%, var(--bg-opacity)) 30%,
+                hsl(287deg, 15%, 62%, var(--bg-opacity)) 39%,
+                hsl(277deg, 16%, 54%, var(--bg-opacity)) 46%,
+                hsl(271deg, 20%, 45%, var(--bg-opacity)) 54%,
+                hsl(266deg, 28%, 37%, var(--bg-opacity)) 61%,
+                hsl(261deg, 40%, 30%, var(--bg-opacity)) 69%,
+                hsl(255deg, 59%, 22%, var(--bg-opacity)) 79%,
+                hsl(245deg, 100%, 14%, var(--bg-opacity)) 100%
+        );
+    }
+}

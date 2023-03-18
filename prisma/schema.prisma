@@ -15,7 +15,12 @@ model User {
   updatedAt DateTime @updatedAt
 
   password Password?
-  notes    Note[]
+
+  employeeDetails EmployeeDetails? @relation(fields: [employeeDetailsId], references: [id])
+
+  roleId            String
+  role              Role    @relation(fields: [roleId], references: [id])
+  employeeDetailsId String?
 }
 
 model Password {
@@ -25,14 +30,46 @@ model Password {
   userId String @unique
 }
 
-model Note {
+// We want the following roles:
+// - Admin - can see and manage all users-timesheets
+// - Manager - can see and manage users-timesheets that are assigned to them. Currently this is the same as admin, but in the future we might want to have managers that can only see timesheets of their own employees
+// - Employee - can see their own timesheets
+// 
+// Note. the roles have to be enforced in the code, not in the database
+model Role {
   id    String @id @default(cuid())
-  title String
-  body  String
+  name  String @unique
+  users User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
 }
+
+// The EmployeeDetails model is used to store information about the employee that is not stored in the xledger database.
+model EmployeeDetails {
+  id String @id @default(cuid())
+
+  xledgerId           String? @unique // xledgerId is the databaseId of the user in xledger. Used for access control - so that only users with the correct xledgerId can access the data
+  provisionPercentage Float?  @default(0.0) // The percentage of the provision that the user gets, for the amount over the self-cost
+  selfCostFactor      Float?  @default(1.5) // The factor that is used to calculate the self-cost of a timesheet
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[] // The user that this employee details belongs to
+}
+
+// Consider keeping a history of the variable changes https://sl.bing.net/gYOJ8PW1O8G
+// model EmployeeDetailsHistory {
+//   id String @id @default(cuid())
+//
+//   xledgerId           String?
+//   provisionPercentage Float?
+//   selfCostFactor      Float?
+//
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//
+//   // Add a relation field to link each history record to the corresponding employee
+//   employeeId     String
+//   employee       EmployeeDetails @relation(fields: [employeeId], references: [id])
+// }

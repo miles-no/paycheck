@@ -1,0 +1,23 @@
+@startuml
+title flowchart
+
+start
+if (Logged in?) then (yes)
+else (no)
+    :Login;
+endif
+
+:Check roles;
+if (Is manager?) then (yes)
+    :View list of employees;
+    :Select employee;
+else if (Is employee?) then (yes)
+
+else (no)
+    :View error page informing about \nmissing roles for the application;
+    :Provide link to log out;
+    end
+endif
+    :View employee timesheet;
+stop
+@enduml
