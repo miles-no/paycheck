@@ -88,6 +88,7 @@ export async function createUserSession({
 }
 
 export async function logout(request: Request) {
+  // Todo: Only use social user
   const session = await getSession(request);
   console.log("logging out", session);
   return redirect("/", {

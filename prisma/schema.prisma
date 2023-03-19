@@ -7,29 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id    String @id @default(cuid())
-  email String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  password Password?
-
-  employeeDetails EmployeeDetails? @relation(fields: [employeeDetailsId], references: [id])
-
-  roleId            String
-  role              Role    @relation(fields: [roleId], references: [id])
-  employeeDetailsId String?
-}
-
-model Password {
-  hash String
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String @unique
-}
-
 // We want the following roles:
 // - Admin - can see and manage all users-timesheets
 // - Manager - can see and manage users-timesheets that are assigned to them. Currently this is the same as admin, but in the future we might want to have managers that can only see timesheets of their own employees
@@ -55,21 +32,23 @@ model EmployeeDetails {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User[] // The user that this employee details belongs to
+  User      User[]
 }
 
-// Consider keeping a history of the variable changes https://sl.bing.net/gYOJ8PW1O8G
-// model EmployeeDetailsHistory {
-//   id String @id @default(cuid())
-//
-//   xledgerId           String?
-//   provisionPercentage Float?
-//   selfCostFactor      Float?
-//
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//
-//   // Add a relation field to link each history record to the corresponding employee
-//   employeeId     String
-//   employee       EmployeeDetails @relation(fields: [employeeId], references: [id])
-// }
+model User {
+  id String @id @default(cuid()) // The id of the user in our database
+
+  googleId String @unique // The id of the user in google. Used for authentication
+  name     String // The name of the user
+  email    String @unique // The email of the user
+  picture  String // The picture of the user
+
+  roleId String // The role of the user (admin, manager, employee)
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  employeeDetailsId String? // The id of the employeeDetails of the user
+  employeeDetails   EmployeeDetails? @relation(fields: [employeeDetailsId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

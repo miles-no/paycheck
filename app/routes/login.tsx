@@ -6,6 +6,7 @@ import * as React from "react";
 import { verifyLogin } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
 import { safeRedirect, validateEmail } from "~/utils";
+import { SocialsProvider } from "remix-auth-socials";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
@@ -175,6 +176,15 @@ export default function LoginPage() {
             <br />
             Visste du at Miles har lisens for 1Password for alle sine ansatte?
           </p>
+        </Form>
+        <Form method="post" action={`/auth/${SocialsProvider.GOOGLE}`}>
+          <button
+            className={
+              "w-full rounded bg-red-500  py-2 px-4 text-white hover:bg-red-600 focus:bg-red-400"
+            }
+          >
+            Login with Google
+          </button>
         </Form>
       </div>
     </div>

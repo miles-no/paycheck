@@ -20,35 +20,39 @@ export default function UsersPage() {
   return (
     <main className={"container mx-auto px-4"}>
       <h1>Users</h1>
-      <table>
+      <pre>
+        <code>{JSON.stringify(users, null, 2)}</code>
+      </pre>
+      <table className={"table-auto"}>
         <thead>
           <tr>
-            <th>Email</th>
-            <th>Role</th>
-            <th>dbID</th>
-            <th>Xledger ID</th>
-            <th>Edit</th>
-            <th>Delete</th>
+            <th className={"px-4 py-2"}>Name</th>
+            <th className={"px-4 py-2"}>Email</th>
+            <th className={"px-4 py-2"}>Role</th>
+            <th className={"px-4 py-2"}>Employee Details</th>
+            <th className={"px-4 py-2"}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => {
-            const { id, email, employeeDetails, role } = user;
-            return (
-              <tr key={id}>
-                <td>{email}</td>
-                <td>{role.name}</td>
-                <td>{id}</td>
-                <td>{employeeDetails?.xledgerId}</td>
-                <td>
-                  <a href={`/users/${id}/edit`}>Edit</a>
-                </td>
-                <td>
-                  <a href={`/users/${id}/delete`}>Delete</a>
-                </td>
-              </tr>
-            );
-          })}
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td className={"border px-4 py-2"}>{user.name}</td>
+              <td className={"border px-4 py-2"}>{user.email}</td>
+              <td className={"border px-4 py-2"}>{user.role.name}</td>
+              <td className={"border px-4 py-2"}>
+                {user.employeeDetails ? (
+                  <pre>
+                    <code>{JSON.stringify(user.employeeDetails, null, 2)}</code>
+                  </pre>
+                ) : (
+                  "No employee details"
+                )}
+              </td>
+              <td className={"border px-4 py-2"}>
+                <a href={`/users/${user.id}`}>Edit</a>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </main>

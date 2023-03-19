@@ -3,22 +3,44 @@ import { json, redirect } from "@remix-run/node";
 import { NavLink, useLoaderData } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/router";
 import { StatBox } from "~/components/statBox";
-import { requireUser } from "~/session.server";
-import { useOptionalUser } from "~/utils";
 import { Role } from "../../prisma/seed";
+import { requireGoogleUser } from "~/routes/dashboard";
+import { prisma } from "~/db.server";
+import type { GoogleProfile } from "remix-auth-google";
+
+export async function getDbUser(user: GoogleProfile) {
+  return prisma.user.findUnique({
+    where: {
+      googleId: user.id,
+    },
+    include: {
+      role: true,
+    },
+  });
+}
+
+async function getRole(user: GoogleProfile) {
+  const dbUser = await getDbUser(user);
+  return dbUser?.role.name;
+}
+
+export const getUser = async (request: Request) => {
+  const user = await requireGoogleUser(request);
+  const userRole = await getRole(user);
+  return { user, userRole };
+};
 
 export const loader: LoaderFunction = async ({ request }) => {
-  // Guard against non-admins or managers
-  const user = await requireUser(request);
-  const userRole = user?.role.name;
-  const allowedRoles = [Role.admin, Role.manager];
-
   // only let managers and admins see the overview page
+  const { userRole } = await getUser(request);
+  const allowedRoles = [Role.admin, Role.manager];
   if (!allowedRoles.includes(userRole as Role)) {
     return redirect("/403");
   }
 
-  const metaKey = request.headers.get("user-agent")?.includes("Mac") ? "⌘" : "ctrl";
+  const metaKey = request.headers.get("user-agent")?.includes("Mac")
+    ? "⌘"
+    : "ctrl";
   return json({ metaKey });
 };
 

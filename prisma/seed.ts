@@ -32,62 +32,18 @@ async function seed() {
     }),
   ]);
 
-  const employeeDetails = await prisma.employeeDetails.create({
-    data: {
-      xledgerId: "26839556",
-    },
-  });
-
-  // Add Henry
   await prisma.user.create({
     data: {
-      email: "henry@miles.no",
-      password: {
-        create: {
-          hash: await bcrypt.hash("henrypassword", 10),
+      email: "henry.sjoen@miles.no",
+      googleId: "105452855211059551858",
+      name: "Henry Sjøen",
+      picture:
+        "https://lh3.googleusercontent.com/a/AGNmyxYXhcU8d2Pnux3C5vymoXib2Vzhe4BfV365WEfz=s96-c",
+      role: {
+        connect: {
+          id: adminRole.id,
         },
       },
-      roleId: employee.id,
-      employeeDetailsId: employeeDetails.id,
-    },
-  });
-
-  // Admin user
-  await prisma.user.create({
-    data: {
-      email: "admin@miles.no",
-      password: {
-        create: {
-          hash: await bcrypt.hash("adminpassword", 10),
-        },
-      },
-      roleId: adminRole.id,
-    },
-  });
-
-  // Manager user
-  await prisma.user.create({
-    data: {
-      email: "manager@miles.no",
-      password: {
-        create: {
-          hash: await bcrypt.hash("managerpassword", 10),
-        },
-      },
-      roleId: managerRole.id,
-    },
-  });
-
-  // Employee user
-  await prisma.user.create({
-    data: {
-      email: "employee@miles.no",
-      password: {
-        create: {
-          hash: await bcrypt.hash("employeepassword", 10),
-        },
-      },
-      roleId: employee.id,
     },
   });
 
