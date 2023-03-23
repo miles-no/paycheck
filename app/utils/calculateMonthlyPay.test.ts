@@ -1,5 +1,5 @@
-import { calculateMonthlyPayFromTimesheet } from "./calculateMonthlyPayFromTimesheet";
 import { generateXledgerTimesheetTestData } from "~/utils/generateXledgerTimesheetTestData";
+import { calculateMonthlyPayFromTimesheet } from "./calculateMonthlyPayFromTimesheet";
 
 test("Calculate monthly pay for employee", () => {
   expect(

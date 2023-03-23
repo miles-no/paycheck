@@ -107,3 +107,19 @@ body {
         );
     }
 }
+.redacted{
+    filter: blur(10px);
+}
+
+/* Comment out to show all */
+/*Project name, name of person, provision percentage etc*/
+
+.blur, .blur-md {
+    filter:none;
+}
+
+/*!*Rate and hours etc*!*/
+
+.redacted{
+    filter: none;
+}

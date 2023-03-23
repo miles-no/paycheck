@@ -1,5 +1,13 @@
 # Miles Timesheets
 
+## Local database
+
+https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database
+
+> Version 14 is currently used in our google cloud-instance, so it is recommended to use the same version locally.
+ 
+
+
 ## Using git-secret
 
 This repository uses `git-secret` to encrypt sensitive files such as environment variables. `git-secret` allows you to store encrypted versions of these files in the repository while keeping the unencrypted versions only on machines that have the decryption key.
@@ -43,13 +51,13 @@ to access the page. If a user is not able to access the page, they should be red
 
 To calculate the pay for a given employee, you need to know the following:
 
-Project + task. How many hours and at what rate.
+Project + activity. How many hours and at what rate.
 
 Each employee has some variables that are used to calculate the pay:
 
-- Yearly fixed salary
-- Self-cost factor
-- Provision percentage
+- Yearly fixed salary (Fetched from xledger)
+- Self-cost factor (Stored in a table)
+- Provision percentage (Stored in a table)
 
 The above can be edited by the manager.
 
@@ -59,8 +67,8 @@ We can then calculate the pay for an employee as follows:
 - `Monthly invoiced turnover = SUM (Hours * hourly rate) // note calculation is done per project`
 - `Monthly self-cost = Monthly fixed salary * self-cost factor`
 - `Net amount invoiced that exceeds self-cost = MAX (Monthly invoiced turnover - self-cost; 0)`
-- `Monthly commission = (Monthly invoiced turnover - self-cost) * provision percentage`
-- `Monthly pay = Monthly fixed salary + Monthly commission`
+- `Monthly provision = (Monthly invoiced turnover - self-cost) * provision percentage`
+- `Monthly pay = Monthly fixed salary + Monthly provision`
 
 ### Special cases
 
@@ -99,6 +107,8 @@ S-107 should be paid at 50% of the "Main project".
 - Guard: This page should be accessible to all users.
 
 ## What's in the stack
+
+> This project is based on the remix-indie stack as shown below. We might not use all of the stack or have decided on going a different direction, (like google auth instead of handling it ourselves), so there are some parts of the code that should be removed.
 
 - [Fly app deployment](https://fly.io) with [Docker](https://www.docker.com/)
 - Production-ready [SQLite Database](https://sqlite.org)

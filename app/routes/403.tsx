@@ -1,6 +1,5 @@
-import { LinksFunction } from "@remix-run/node";
+import type { LinksFunction } from "@remix-run/node";
 import blobBackgroundStylesheetUrl from "~/styles/blobBackground.css";
-import React from "react";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: blobBackgroundStylesheetUrl }];

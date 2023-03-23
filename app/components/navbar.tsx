@@ -1,47 +1,51 @@
-/*
-  This example requires some changes to your config:
-
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useLocation } from "react-router";
+import type { EmployeeDetails, Role, User } from ".prisma/client";
+import { Role as RoleEnum } from "~/enums/role";
 
-const user = {
-  name: "Henry Sjøen",
-  email: "henry.sjoen@miles.no",
-  imageUrl:
-    "https://lh3.googleusercontent.com/a/AGNmyxYXhcU8d2Pnux3C5vymoXib2Vzhe4BfV365WEfz=s96-c",
-};
-const navigation = [
-  { name: "Dashboard", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Projects", href: "#", current: false },
-  { name: "Calendar", href: "#", current: false },
-];
 const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Min profil", href: "/profile" },
+  { name: "Logg ut", href: "/logout" },
 ];
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Navbar() {
+export default function Navbar(props: {
+  user?: User & { role: Role; employeeDetails: EmployeeDetails | null };
+}) {
+  const location = useLocation();
+
+  let navigation: { name: string; href: string }[] = [];
+
+  if (props.user?.role?.name === RoleEnum.admin) {
+    navigation = [
+      ...navigation,
+      { name: "Oversikt", href: "/overview" },
+      { name: "Ansatte", href: "/employees" },
+      { name: "Brukere", href: "/users" },
+    ];
+  }
+  navigation = [
+    ...navigation,
+    { name: "Min profil", href: "/profile" },
+    {
+      name: "Min timeliste",
+      href: `/employees/${
+        props.user?.employeeDetails?.xledgerId
+      }/timesheets/${new Date().getFullYear()}/${new Date().getMonth() + 1}`,
+      //   Todo: make the link highlight work for sub-pages as well
+    },
+  ];
+
   return (
-    <Disclosure as="header" className="bg-gray-800">
+    <Disclosure
+      as="header"
+      className="bg-white bg-opacity-30 dark:bg-black dark:bg-opacity-90"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:divide-y lg:divide-gray-700 lg:px-8">
@@ -53,28 +57,6 @@ export default function Navbar() {
                     src="/miles_logo_red_pms.png"
                     alt="Miles"
                   />
-                </div>
-              </div>
-              <div className="relative z-0 flex flex-1 items-center justify-center px-2 sm:absolute sm:inset-0">
-                <div className="w-full sm:max-w-xs">
-                  <label htmlFor="search" className="sr-only">
-                    Search
-                  </label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <MagnifyingGlassIcon
-                        className="h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <input
-                      id="search"
-                      name="search"
-                      className="block w-full rounded-md border-0 bg-gray-700 py-1.5 pl-10 pr-3 text-gray-300 placeholder:text-gray-400 focus:bg-white focus:text-gray-900 focus:ring-0 focus:placeholder:text-gray-500 sm:text-sm sm:leading-6"
-                      placeholder="Search"
-                      type="search"
-                    />
-                  </div>
                 </div>
               </div>
               <div className="relative z-10 flex items-center lg:hidden">
@@ -89,14 +71,6 @@ export default function Navbar() {
                 </Disclosure.Button>
               </div>
               <div className="hidden lg:relative lg:z-10 lg:ml-4 lg:flex lg:items-center">
-                <button
-                  type="button"
-                  className="flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
-
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-4 flex-shrink-0">
                   <div>
@@ -104,7 +78,7 @@ export default function Navbar() {
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        src={user.imageUrl}
+                        src={props.user?.picture}
                         alt=""
                       />
                     </Menu.Button>
@@ -148,12 +122,14 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   className={classNames(
-                    item.current
-                      ? "bg-gray-900 text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                    "inline-flex items-center rounded-md py-2 px-3 text-sm font-medium"
+                    location.pathname === item.href
+                      ? "border-b border-black bg-opacity-50 font-bold text-gray-900 dark:border-gray-700 dark:text-gray-300"
+                      : "border-b border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:border-gray-700 dark:hover:text-gray-300",
+                    "inline-flex items-center py-2 px-3 text-sm font-medium"
                   )}
-                  aria-current={item.current ? "page" : undefined}
+                  aria-current={
+                    location.pathname === item.href ? "page" : undefined
+                  }
                 >
                   {item.name}
                 </a>
@@ -169,12 +145,14 @@ export default function Navbar() {
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current
+                    location.pathname === item.href
                       ? "bg-gray-900 text-white"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white",
                     "block rounded-md py-2 px-3 text-base font-medium"
                   )}
-                  aria-current={item.current ? "page" : undefined}
+                  aria-current={
+                    location.pathname === item.href ? "page" : undefined
+                  }
                 >
                   {item.name}
                 </Disclosure.Button>
@@ -185,16 +163,16 @@ export default function Navbar() {
                 <div className="flex-shrink-0">
                   <img
                     className="h-10 w-10 rounded-full"
-                    src={user.imageUrl}
+                    src={props.user?.picture}
                     alt=""
                   />
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-medium text-white">
-                    {user.name}
+                    {props.user?.name}
                   </div>
                   <div className="text-sm font-medium text-gray-400">
-                    {user.email}
+                    {props.user?.email}
                   </div>
                 </div>
                 <button

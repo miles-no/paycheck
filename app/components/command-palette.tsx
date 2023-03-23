@@ -4,6 +4,7 @@ import { Combobox, Dialog, Transition } from "@headlessui/react";
 import {
   ArrowLeftOnRectangleIcon,
   ChartBarIcon,
+  ClockIcon,
   HomeIcon,
   UserCircleIcon,
   UsersIcon,
@@ -47,6 +48,13 @@ function getIcon(icon: string) {
     case "logout":
       return (
         <ArrowLeftOnRectangleIcon
+          className="h-5 w-5 text-gray-400 dark:text-white"
+          aria-hidden="true"
+        />
+      );
+    case "clock":
+      return (
+        <ClockIcon
           className="h-5 w-5 text-gray-400 dark:text-white"
           aria-hidden="true"
         />
@@ -162,7 +170,7 @@ export default function CommandPalette(props: {
 
                   {query !== "" && filteredPeople.length === 0 && (
                     <p className="p-4 text-sm text-gray-500 dark:text-white">
-                      No people found.
+                      No actions found for "{query}"
                     </p>
                   )}
                 </Combobox>

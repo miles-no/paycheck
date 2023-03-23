@@ -1,6 +1,5 @@
 import LRUCache from "lru-cache";
 import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
-import type { Employee } from "~/services/getEmployees.server";
 
 let cache: LRUCache<string, any>;
 

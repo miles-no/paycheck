@@ -1,28 +1,34 @@
-import type { ActionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-
-import type { LoaderFunction } from "@remix-run/router";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useTransition,
-} from "@remix-run/react";
-import React, { Fragment, useEffect, useState } from "react";
-import {
-  getEmployeeDetailsByXledgerId,
-  upsertEmployeeDetails,
-} from "~/models/employeeDetails.server";
-import { requireUser } from "~/session.server";
-import { Role } from "../../../../prisma/seed";
-import { isAdminOrManager } from "~/utils/isAdminOrManager";
+import type { EmployeeDetails, Role as UserRole, User } from ".prisma/client";
+import { Transition } from "@headlessui/react";
 import {
   CheckCircleIcon,
   XCircleIcon,
-  XMarkIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
-import { Transition } from "@headlessui/react";
+import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useTransition
+} from "@remix-run/react";
+import { Fragment, useEffect, useState } from "react";
 import { cache } from "~/cache";
+import Navbar from "~/components/navbar";
+import { Role } from "~/enums/role";
+import {
+  getEmployeeDetailsByXledgerId,
+  upsertEmployeeDetails
+} from "~/models/employeeDetails.server";
+import {
+  getDbUserByXledgerId,
+  getRole,
+  requireAdminOrManager,
+  requireUser
+} from "~/services/user.server";
+import { isAdminOrManager } from "~/utils/isAdminOrManager";
 
 interface xledgerEmployeeResponse {
   data: {
@@ -82,63 +88,66 @@ export async function getXledgerEmployeeData(employeeId: string) {
   return json;
 }
 
-export const loader: LoaderFunction = async ({ params, context, request }) => {
+export async function loader({ params, context, request }: LoaderArgs) {
   const { employeeId } = params;
 
-  // Redirect to log in if the user is not logged in
   const user = await requireUser(request);
-
-  // If no role, redirect to login
-  const roleName = user?.role.name as Role;
-  if (![Role.employee, Role.admin, Role.manager].includes(roleName)) {
-    return redirect("/403");
+  if (!user) return redirect("/login");
+  if (user.role.name === ("admin" || "manager")) {
+    // good to go
+  } else {
+    // Check if user is allowed to view this page
+    if (user.employeeDetails && user.employeeDetails.xledgerId !== employeeId)
+      return redirect("/403");
   }
 
-  // If user is not an admin or manager, and the employeeId in the url does not match the logged-in user's xledgerId
   const employeeDetails = await getEmployeeDetailsByXledgerId(
     employeeId as string
   );
-  if (
-    // If user is not an admin or manager, and the employeeId in the url does not match the logged-in user's xledgerId
-    ![Role.admin, Role.manager].includes(roleName) &&
-    employeeDetails?.xledgerId !== employeeId
-  ) {
-    return redirect("/402");
-  }
+  const selfCostFactor = employeeDetails?.selfCostFactor;
+  const provisionPercentage = employeeDetails?.provisionPercentage;
 
-  // Get employee data from xledger
-  const xledgerData = await getXledgerEmployeeData(employeeId as string);
-  const { employee, rate: yearlyFixedSalary } =
-    xledgerData.data?.payrollRates?.edges?.[0]?.node;
-  const { code, description, email } = employee;
+  const xledgerEmployeeData = await getXledgerEmployeeData(
+    employeeId as string
+  );
+  const yearlyFixedSalary =
+    xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.rate || 0;
+
+  const selectedUser = await getDbUserByXledgerId(employeeId as string);
+  const role = selectedUser ? await getRole(selectedUser.roleId) : null;
+  const selectedUserRole = role?.name || "NO ROLE";
 
   return json({
     employee: {
       xledgerId: employeeId,
-      code,
-      description,
-      email,
+      code:
+        xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.employee
+          ?.code || "",
+      description:
+        xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.employee
+          ?.description || "",
+      email:
+        xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.employee
+          ?.email || "",
       yearlyFixedSalary,
-      ...employeeDetails,
+      provisionPercentage,
+      selfCostFactor,
     },
-    isAdminOrManager: isAdminOrManager(roleName),
+    selectedUserRole,
+    user,
+    isAdminOrManager: isAdminOrManager(user.role.name as Role),
   });
-};
+}
 
 export const action = async ({ request }: ActionArgs) => {
   // Only admins and managers can modify employee details
-  const user = await requireUser(request);
-  if (!isAdminOrManager(user?.role.name as Role)) {
-    return redirect("/403");
-  }
+  await requireAdminOrManager(request);
 
   const formData = await request.formData();
   const xledgerId = formData.get("xledgerId") as string;
   const provisionPercentage =
     parseFloat(formData.get("provision-percentage") as string) / 100;
   const selfCostFactor = parseFloat(formData.get("self-cost-factor") as string);
-
-  console.log({ xledgerId, provisionPercentage, selfCostFactor });
 
   if (isNaN(provisionPercentage) || isNaN(selfCostFactor)) {
     return json({
@@ -164,12 +173,14 @@ export const action = async ({ request }: ActionArgs) => {
 };
 
 export default function EmployeeEditPage() {
-  const { employee, isAdminOrManager } = useLoaderData<typeof loader>();
+  const { employee, isAdminOrManager, selectedUserRole, user } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData();
   const hasSucceeded = !!actionData?.success;
   const hasFailed = !!actionData?.error;
   const isSubmitting = useTransition().state === "submitting";
   const [show, setShow] = useState(hasSucceeded || hasFailed);
+
   useEffect(() => {
     if (hasSucceeded || hasFailed) {
       setShow(true);
@@ -180,21 +191,65 @@ export default function EmployeeEditPage() {
   }, [hasSucceeded, hasFailed, isSubmitting]);
 
   return (
-    <main className={"mx-auto flex max-w-7xl flex-col p-10"}>
-      <XledgerInfoSection employee={employee} />
-      <Divider />
-      <ExtraVariablesSection
-        employee={employee}
-        isSubmitting={isSubmitting}
-        disabled={!isAdminOrManager}
+    <>
+      <Navbar
+        user={
+          user as unknown as User & {
+            role: UserRole;
+            employeeDetails: EmployeeDetails | null;
+          }
+        }
       />
-      <NotificationContainer
-        hasFailed={hasFailed}
-        hasSucceeded={hasSucceeded}
-        setShow={setShow}
-        show={show}
-      />
-    </main>
+      <main className={"mx-auto flex max-w-7xl flex-col p-10"}>
+        <RoleSection role={selectedUserRole} />
+        <Divider />
+        <XledgerInfoSection
+          employee={{
+            xledgerId: `${employee.xledgerId}`,
+            code: employee.code,
+            description: employee.description,
+            email: employee.email,
+            yearlyFixedSalary: employee.yearlyFixedSalary,
+          }}
+        />
+        <Divider />
+        <ExtraVariablesSection
+          employee={{
+            xledgerId: `${employee.xledgerId}`,
+            provisionPercentage: employee.provisionPercentage || 0,
+            selfCostFactor: employee.selfCostFactor || 0,
+          }}
+          isSubmitting={isSubmitting}
+          disabled={!isAdminOrManager}
+        />
+        {/*links*/}
+        <Divider />
+
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <ExplanationHeader
+            title="Lenker"
+            description="Lenker til andre sider i systemet."
+          />
+          <div className="mt-5 md:col-span-2 md:mt-0">
+            <Link
+              to={`/employees/${employee.xledgerId
+                }/timesheets/${new Date().getFullYear()}/${new Date().getMonth() + 1
+                }`}
+              className="text-gray-900 underline hover:text-gray-600 dark:text-gray-100 dark:hover:text-gray-200"
+            >
+              Timeliste
+            </Link>
+          </div>
+        </div>
+
+        <NotificationContainer
+          hasFailed={hasFailed}
+          hasSucceeded={hasSucceeded}
+          setShow={setShow}
+          show={show}
+        />
+      </main>
+    </>
   );
 }
 
@@ -214,9 +269,58 @@ function ExplanationHeader(props: { title: string; description: string }) {
   );
 }
 
-function XledgerInfoSection(props: {
+export function RoleSection(props: { role?: string }) {
+  const { role } = props;
+  if (!role) return null;
+  return (
+    <div className="md:grid md:grid-cols-3 md:gap-6">
+      <ExplanationHeader
+        title="Rolle"
+        description="Dette er rollen til brukeren i Miles Timesheets."
+      />
+      <div className="mt-5 md:col-span-2 md:mt-0">
+        <div className="overflow-hidden shadow sm:rounded-md">
+          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              {/*NAVN*/}
+              <div className="col-span-6 sm:col-span-3">
+                <Form>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+                    Rolle
+                    <p
+                      className={
+                        "text-xl capitalize text-gray-900 dark:text-gray-100"
+                      }
+                    >
+                      {role === Role.employee ? "Ansatt" : role}
+                    </p>
+                  </label>
+                </Form>
+              </div>
+              <div className="col-span-6 sm:col-span-3">
+                {/*  Let's explain the role*/}
+                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+                  Forklaring
+                </label>
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {role === Role.employee
+                    ? "Kan se egne timelister."
+                    : role === (Role.admin || Role.manager)
+                      ? "Kan se alle ansattes timelister og endre provisjonsprosent og selvkostfaktor."
+                      : "Denna brukeren har ingen rolle. Det kan hende at brukeren ikke har logget inn enda."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function XledgerInfoSection(props: {
   employee: {
-    xledgerId: number;
+    xledgerId: string;
     code: string;
     description: string;
     email: string;
@@ -282,7 +386,11 @@ function XledgerInfoSection(props: {
               <div className="col-span-3 sm:col-span-3">
                 <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
                   Årsinntekt Fastlønn
-                  <p className={"text-xl text-gray-900 dark:text-gray-100"}>
+                  <p
+                    className={
+                      "text-xl text-gray-900 blur-md dark:text-gray-100"
+                    }
+                  >
                     {Intl.NumberFormat("no-NO", {
                       style: "currency",
                       currency: "NOK",
@@ -298,7 +406,7 @@ function XledgerInfoSection(props: {
   );
 }
 
-function Divider() {
+export function Divider() {
   return (
     <div className="py-5 sm:py-10" aria-hidden="true">
       <div className="hidden border-t border-gray-200 dark:border-gray-700 sm:block" />
@@ -306,7 +414,7 @@ function Divider() {
   );
 }
 
-function ExtraVariablesSection(props: {
+export function ExtraVariablesSection(props: {
   disabled?: boolean;
   employee: {
     selfCostFactor: number;
@@ -321,7 +429,7 @@ function ExtraVariablesSection(props: {
       <ExplanationHeader
         title="Ekstra informasjon"
         description="Dette er individuelle variabler som er lagt inn i systemet for å
-        kunne beregne lønn, og knytte en bruker opp mot rett data. Denne er per dags dato ikke tilgengelig i
+        kunne beregne lønn. Denne er per dags dato ikke tilgengelig i
         xledger."
       />
       <div className="mt-5 md:col-span-2 md:mt-0">
@@ -335,7 +443,6 @@ function ExtraVariablesSection(props: {
           />
           <div className="overflow-hidden shadow sm:rounded-md">
             <div className="bg-white px-4 py-5 dark:bg-opacity-10 sm:p-6">
-              {/**/}
               <div className="grid grid-cols-6 gap-6">
                 <div className="col-span-6 sm:col-span-3">
                   <label
@@ -344,31 +451,33 @@ function ExtraVariablesSection(props: {
                   >
                     Provisjonsprosent
                   </label>
-                  {disabled ? (
-                    <p className="align-baseline text-4xl font-semibold text-gray-900 dark:text-gray-100">
-                      {employee?.provisionPercentage * 100}{" "}
-                      <span
-                        className={
-                          "align-baseline text-2xl text-gray-500 dark:text-gray-400"
-                        }
-                      >
-                        %
-                      </span>
-                    </p>
-                  ) : (
-                    <input
-                      type="number"
-                      name="provision-percentage"
-                      id="provision-percentage"
-                      autoComplete="provision-percentage"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
-                      defaultValue={employee?.provisionPercentage * 100}
-                      disabled={disabled}
-                      required
-                      min={0}
-                      max={100}
-                    />
-                  )}
+                  <span className={"blur-md"}>
+                    {disabled ? (
+                      <p className="align-baseline text-4xl font-semibold text-gray-900 blur-md hover:blur-0 dark:text-gray-100">
+                        {employee?.provisionPercentage * 100}{" "}
+                        <span
+                          className={
+                            "align-baseline text-2xl text-gray-500 dark:text-gray-400"
+                          }
+                        >
+                          %
+                        </span>
+                      </p>
+                    ) : (
+                      <input
+                        type="number"
+                        name="provision-percentage"
+                        id="provision-percentage"
+                        autoComplete="provision-percentage"
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
+                        defaultValue={employee?.provisionPercentage * 100}
+                        disabled={disabled}
+                        required
+                        min={0}
+                        max={100}
+                      />
+                    )}
+                  </span>
                 </div>
 
                 <div className="col-span-6 sm:col-span-3">
@@ -378,29 +487,31 @@ function ExtraVariablesSection(props: {
                   >
                     Selvkostfaktor
                   </label>
-                  {disabled ? (
-                    <p
-                      className={
-                        "align-baseline text-4xl font-semibold text-gray-900 dark:text-gray-100"
-                      }
-                    >
-                      {employee?.selfCostFactor}
-                    </p>
-                  ) : (
-                    <input
-                      type="number"
-                      name="self-cost-factor"
-                      id="self-cost-factor"
-                      step={0.01}
-                      autoComplete="self-cost-factor"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
-                      defaultValue={employee?.selfCostFactor}
-                      disabled={disabled}
-                      required
-                      min={0}
-                      max={100}
-                    />
-                  )}
+                  <span className={"blur-md"}>
+                    {disabled ? (
+                      <p
+                        className={
+                          "align-baseline text-4xl font-semibold text-gray-900 dark:text-gray-100"
+                        }
+                      >
+                        {employee?.selfCostFactor}
+                      </p>
+                    ) : (
+                      <input
+                        type="number"
+                        name="self-cost-factor"
+                        id="self-cost-factor"
+                        step={0.01}
+                        autoComplete="self-cost-factor"
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
+                        defaultValue={employee?.selfCostFactor}
+                        disabled={disabled}
+                        required
+                        min={0}
+                        max={100}
+                      />
+                    )}
+                  </span>
                 </div>
               </div>
             </div>

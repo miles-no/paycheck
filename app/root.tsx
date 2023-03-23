@@ -12,9 +12,9 @@ import {
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import globalStylesheetUrl from "./styles/global.css";
-import { getUser } from "./session.server";
 import CommandPalette from "~/components/command-palette";
-import { getEmployeeDump } from "~/services/getEmployees.server";
+import { getEmployees } from "~/services/getEmployees.server";
+import { optionalUser } from "~/services/user.server";
 
 export const links: LinksFunction = () => {
   return [
@@ -42,34 +42,48 @@ export interface Command {
   icon: string;
 }
 
+export const pages: Command[] = [
+  { id: "home", name: "Hjem", url: "/", icon: "home" },
+  { id: "logout", name: "Logg ut", url: "/logout", icon: "logout" },
+  { id: "profile", name: "Profil", url: "/profile", icon: "user" },
+];
+export const adminPages: Command[] = [
+  { id: "overview", name: "Oversikt", url: "/overview", icon: "chart-bar" },
+  { id: "employees", name: "Ansatte", url: "/employees", icon: "users" },
+];
 export async function loader({ request }: LoaderArgs) {
-  const employeeResponse = await getEmployeeDump();
-  const year = new Date().getFullYear();
-  const month = new Date().getMonth() + 1;
-  // todo: adjust commands based on the logged in user
-  const pages: Command[] = [
-    { id: "home", name: "Hjem", url: "/", icon: "home" },
-    { id: "overview", name: "Oversikt", url: "/overview", icon: "chart-bar" },
-    { id: "employees", name: "Ansatte", url: "/employees", icon: "users" },
-    { id: "logout", name: "Logg ut", url: "/logout", icon: "logout" },
-  ];
-  const employees: Command[] = employeeResponse.data.employees.edges
-    .map((edge) => edge.node)
-    .map((employee) => ({
-      id: `${employee.dbId}`,
-      name: employee.description,
-      url: `/employees/${employee.dbId}/timesheets/${year}/${month}`,
-      icon: "user",
-    }));
-  const commands = [...pages, ...employees];
-
   // get the meta key from the request headers
   const metaKey = request.headers.get("user-agent")?.includes("Mac")
     ? "⌘"
     : "ctrl";
 
+  const user = await optionalUser(request);
+  if (!user) return json({ commands: [], metaKey });
+
+  // todo: adjust commands based on the logged in user
+  let commands: Command[] = [...pages];
+  if (user.role.name === "admin" || user.role.name === "manager") {
+    const employees = await getEmployees();
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1;
+    commands = [
+      ...pages,
+      ...adminPages,
+      ...employees.map((employee) => ({
+        id: `timesheet-${employee.dbId}`,
+        name: `Timeliste - ${employee.description}`,
+        url: `/employees/${employee.dbId}/timesheets/${year}/${month}`,
+        icon: "clock",
+      })),
+      ...employees.map((employee) => ({
+        id: `employee-${employee.dbId}`,
+        name: `Profil - ${employee.description}`,
+        url: `/employees/${employee.dbId}`,
+        icon: "user",
+      })),
+    ];
+  }
   return json({
-    user: await getUser(request),
     commands: commands,
     metaKey,
   });
@@ -78,14 +92,16 @@ export async function loader({ request }: LoaderArgs) {
 export default function App() {
   const { commands, metaKey } = useLoaderData<typeof loader>();
   return (
-    <html lang="nb-NO" className="h-full font-display">
+    <html lang="nb-NO" className="font-display h-full">
       <head>
         <Meta />
         <Links />
         <title>Miles Timesheets</title>
       </head>
       <body className="h-full bg-gray-100 dark:bg-black dark:text-white">
-        <CommandPalette commands={commands} metaKey={metaKey} />
+        {commands.length > 0 && (
+          <CommandPalette commands={commands} metaKey={metaKey} />
+        )}
         <Outlet />
         <ScrollRestoration />
         <Scripts />

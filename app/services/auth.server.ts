@@ -1,18 +1,39 @@
 import { Authenticator } from "remix-auth";
 import { sessionStorage } from "~/session.server";
-import { GoogleProfile, GoogleStrategy } from "remix-auth-google";
+import type { GoogleProfile } from "remix-auth-google";
+import { GoogleStrategy } from "remix-auth-google";
 import { SocialsProvider } from "remix-auth-socials";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
-import { Role } from "../../prisma/seed";
+import { getEmployees } from "~/services/getEmployees.server";
+import { Role } from "~/enums/role";
 
 export const authenticator = new Authenticator(sessionStorage);
+
 async function handleSocialAuthCallback({
   profile,
 }: {
   profile: GoogleProfile;
 }) {
-  await prisma.user.upsert({
+  const employees = await getEmployees();
+  const xledgerEmployeeMatch = employees.find(
+    (employee) => employee.email === profile.emails[0].value
+  );
+  if (!xledgerEmployeeMatch) {
+    throw new Error(
+      "No Xledger employee found with email " + profile.emails[0].value
+    );
+  }
+
+  const defaultRole = await prisma.role.findUnique({
+    where: {
+      name: Role.employee,
+    },
+  });
+
+  invariant(defaultRole, "No default role found");
+
+  const res = await prisma.user.upsert({
     where: {
       googleId: profile.id,
     },
@@ -21,6 +42,16 @@ async function handleSocialAuthCallback({
       name: profile.displayName,
       email: profile.emails[0].value,
       picture: profile.photos[0].value,
+      employeeDetails: {
+        connectOrCreate: {
+          where: {
+            xledgerId: `${xledgerEmployeeMatch.dbId}`,
+          },
+          create: {
+            xledgerId: `${xledgerEmployeeMatch.dbId}`,
+          },
+        },
+      },
     },
     create: {
       googleId: profile.id,
@@ -29,11 +60,17 @@ async function handleSocialAuthCallback({
       picture: profile.photos[0].value,
       role: {
         connect: {
-          id: Role.employee, // default role
+          id: defaultRole.id,
+        },
+      },
+      employeeDetails: {
+        create: {
+          xledgerId: `${xledgerEmployeeMatch.dbId}`,
         },
       },
     },
   });
+  console.log({ res });
   return profile;
 }
 
