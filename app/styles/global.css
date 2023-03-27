@@ -13,7 +13,6 @@
     box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
 }
 
-
 a {
     transition: all 0.2s ease-in-out;
 }
@@ -28,7 +27,6 @@ a:hover, :focus {
     outline: none;
     box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
 }
-
 
 /*Search button styling*/
 .searchButton {
@@ -107,5 +105,5 @@ body {
     }
 }
 .redacted{
-    filter: blur(10px);
+    /*filter: blur(10px);*/
 }

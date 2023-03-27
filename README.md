@@ -1,37 +1,126 @@
-# Miles Timesheets
+# Miles Timesheets: Payroll Transparency and Accuracy
+
+Miles Timesheets aims to provide employees with a clear and comprehensive understanding of their payroll. The majority of consultants at Miles receive provision-based pay with a base amount, which can vary depending on the project and individual circumstances.
+
+The challenge arises when employees work on projects without a set rate or those not invoiced to customers, but still need to generate provisions. For example, an employee might have a sick child and require leave for a few days each month or work on internal projects. In many cases, the employees should be compensated the same as their main-project for that work.
+
+Additionally, some employees may be involved in multiple projects, complicating the calculation of provisions. The payroll system needs to determine the main project's rate, which may not be immediately clear from the financial records in Xledger.
+
+Miles Timesheets addresses these challenges by making payroll transparent for employees and reducing the error rate before invoicing customers. This ensures that employees have accurate and up-to-date information about their pay, and customers are billed correctly, regardless of the nature of their projects.
+
+Furthermore, Miles Timesheets provides managers and admins with the ability to review all employees' timesheets, offering a comprehensive overview of invoiced amounts versus pay. This enables them to monitor the company's financial health and assist in making informed decisions for future projections and planning.
+
+- [Miles Timesheets: Payroll Transparency and Accuracy](#miles-timesheets-payroll-transparency-and-accuracy)
+  - [Architecture](#architecture)
+  - [Environment variables](#environment-variables)
+  - [Local database](#local-database)
+  - [A note on guarding routes](#a-note-on-guarding-routes)
+  - [Design](#design)
+    - [Tailwind](#tailwind)
+    - [Mobile first](#mobile-first)
+    - [Dark mode](#dark-mode)
+  - [Pages and Guards](#pages-and-guards)
+    - [Login Page](#login-page)
+    - [Employee List Page](#employee-list-page)
+    - [Employee Timesheet Page](#employee-timesheet-page)
+  - [Calculating pay for an employee](#calculating-pay-for-an-employee)
+    - [Special cases](#special-cases)
+  - [What is in the stack](#what-is-in-the-stack)
+  - [Quickstart](#quickstart)
+  - [Development](#development)
+    - [Relevant code](#relevant-code)
+  - [Deployment](#deployment)
+    - [Connecting to your database](#connecting-to-your-database)
+    - [Getting Help with Deployment](#getting-help-with-deployment)
+  - [GitHub Actions](#github-actions)
+  - [Testing](#testing)
+    - [Cypress](#cypress)
+    - [Vitest](#vitest)
+    - [Type Checking](#type-checking)
+    - [Linting](#linting)
+    - [Formatting](#formatting)
+
+## Getting started
+
+1. Install dependencies
+   `npm install`
+2. Setup database 
+   For example a [Local database](#local-database)
+3. Setup environment variables
+    See section [Environment variables](#environment-variables)
+4. Run the project
+   `npm run dev`
+
+## Architecture
+
+![architecture](out/documentation/architecture/Architecture%20overview.svg)
+
+This project is based on the remix-indie stack.
+We might not use all the stack or have decided on going a different direction,
+(like google auth instead of handling it ourselves),
+so there are some parts of the code that should be removed.
+
+For more about the indie-stack. See `## What is in the stack`-section.
+
+## Environment variables
+
+Here is a sample of the environment variables that should be set for this project.
+It is used to set environment variables when running the project locally.
+
+Create a file called `.env` in the root of the project and add the following variables.
+
+```dotenv
+NODE_ENV=development
+BASE_URL="http://localhost:3000"
+SESSION_SECRET="xxxxxx"# random string
+
+DATABASE_URL="postgresql://postgres:********@localhost:5432/miles-timelists?schema=public"
+
+#XLEDGER
+XLEDGER_TOKEN="xxxxxxxx"
+XLEDGER_GRAPHQL_URL="https://www.xledger.net/graphql"
+
+#GOOGLE AUTH
+GOOGLE_CLIENT_ID="1000000000000-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxx"
+```
 
 ## Local database
 
 https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database
 
-> Version 14 is currently used in our google cloud-instance, so it is recommended to use the same version locally.
- 
-## Stack:
+> Version 14 is currently used in our Google cloud-instance, so it is recommended to use the same version locally.
 
-- Remix (remix.run)
-- Typescript
-- Tailwind
-- Prisma
+Then remember to update your environment variables and run `npx prisma migrate dev` to create the tables in the
+database.
 
-- Oath2 - Google (remix-auth-socials)
+## A note on guarding routes
 
-- GraphQL
-- Not using any client atm. Only fetch-...
+Unless public, Always check the user's role before rendering a page.
+This should be done in every `loader` and `action`.
 
+## Design
 
-Security:
+http://remix.run/docs/en/1.14.3/guides/styling
 
-- Check if matching Google-email and the user-email set in xledger is secure.
+### Tailwind
 
+Tailwind has been chosen since it generates pure css in the end.
+You may still write some CSS...
+I can recommend looking at tailwind-ui-components for learning best-practices with regard to UX.
+See tailwind-ui https://tailwindui.com/components
 
-## Using git-secret
+### Mobile first
 
-This repository uses `git-secret` to encrypt sensitive files such as environment variables. `git-secret` allows you to store encrypted versions of these files in the repository while keeping the unencrypted versions only on machines that have the decryption key.
+Try to keep the users in mind when designing components.
+Most users will be using mobile devices.
 
-To use `git-secret`, you'll need to have GPG installed and set up on your machine. Once you've done that, you'll need to be added to the list of users who're allowed to decrypt the files. You can contact `henry.sjoen@miles.no` to request access.
-Or run `git secret whoknows` to see other users who have access.
+Using tailwind, start with mobile, then think about how it will look on larger devices, adding `sm:`, and `md:` etc...
+https://tailwindcss.com/docs/responsive-design#working-mobile-first
 
-Once you've been added, you can decrypt the sensitive files by running `git secret reveal`. Make sure to never commit unencrypted versions of these files to the repository!
+### Dark mode
+
+Tip: Start with light mode, then add `dark:bg-black` and other classnames to make it look nice.
 
 ## Pages and Guards
 
@@ -44,24 +133,20 @@ to access the page. If a user is not able to access the page, they should be red
 - Path: /login
 - Guard: If the user is already logged in, they should be redirected to the home page.
 
-[//]: # "### Home Page"
-[//]: # "- Path: `/home`"
-[//]: # "- Guard: Only authenticated users should be able to access this page. If a user is not logged in, they should be"
-[//]: # "redirected to the login page."
-
 ### Employee List Page
 
 - Path: `/employees`
-- Guard: Only users who're identified as managers should be able to access this page. If a user is not a manager, they
-  should be redirected to the home page.
+- Guard: Only users who are identified as managers should be able to access this page.
+  If a user is not a manager, they should be redirected to the home page.
 
 ### Employee Timesheet Page
 
-- Path: /employees/{employeeId}/timesheets/{year}/{month}
-- Guard: Only users who're identified as employees or managers should be able to access this page. If a user is not an
-  employee or manager, they should be redirected to the home page. Additionally, if a user is a manager, they should
-  only
-  be able to access the timesheet for employees who report to them.
+- Path: `/employees/{employeeId}/timesheets/{year}/{month}`
+- Guard: Only users who are identified as employees or managers should be able to access this page.
+  If a user is not an employee or manager, they should be redirected to the home page.
+  Additionally, if a user is a manager,
+  they should only be able to access the timesheet for employees who report to them.
+  (NOT IMPLEMENTED)
 
 ## Calculating pay for an employee
 
@@ -91,7 +176,7 @@ We can then calculate the pay for an employee as follows:
 The following tasks have special rules for calculating the pay:
 
 | Code  | Task                   | Comment               |
-|-------|------------------------|-----------------------|
+| ----- | ---------------------- | --------------------- |
 | S-101 | Fagsamtaler            | "Main project"        |
 | S-102 | Faglig intervju        | 1000 kr an hour       |
 | S-103 | Bistand innsalg        | "Main project"        |
@@ -112,19 +197,11 @@ worked the most hours for the given month.
 
 Note, that the "Main project" is not necessarily the project with the highest pay but the project with the most hours.
 
-#### Special cases
+## What is in the stack
 
-S-102 should be paid at 1000 kr an hour.
-S-107 should be paid at 50% of the "Main project".
-
-### Error Page
-
-- Path: `/error`
-- Guard: This page should be accessible to all users.
-
-## What's in the stack
-
-> This project is based on the remix-indie stack as shown below. We might not use all of the stack or have decided on going a different direction, (like google auth instead of handling it ourselves), so there are some parts of the code that should be removed.
+> This project is based on the remix-indie stack as shown below. We might not use all the stack or have decided on going
+> a different direction, (like google auth instead of handling it ourselves), so there are some parts of the code that
+> should be removed.
 
 - [Fly app deployment](https://fly.io) with [Docker](https://www.docker.com/)
 - Production-ready [SQLite Database](https://sqlite.org)
@@ -152,7 +229,7 @@ Click this button to create a [Gitpod](https://gitpod.io) workspace with the pro
 
 ## Development
 
-- This step only applies if you've opted out of having the CLI install dependencies for you:
+- This step only applies if you have opted out of having the CLI install dependencies for you:
 
   ```sh
   npx remix init
@@ -179,7 +256,7 @@ The database seed script creates a new user with some data you can use to get st
 
 ### Relevant code
 
-This is a pretty simple note-taking app, but it's a good example of how you can build a full stack app with Prisma and
+This is a pretty simple note-taking app, but it is a good example of how you can build a full stack app with Prisma and
 Remix. The main functionality is creating users, logging in and out, and creating and deleting notes.
 
 - creating users, and logging in and out [./app/models/user.server.ts](./app/models/user.server.ts)
@@ -191,7 +268,7 @@ Remix. The main functionality is creating users, logging in and out, and creatin
 This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging
 environments.
 
-Prior to your first deployment, you'll need to do a few things:
+Prior to your first deployment, you will need to do a few things:
 
 - [Install Fly](https://fly.io/docs/getting-started/installing-flyctl/)
 
@@ -264,7 +341,7 @@ running `fly ssh console -C database-cli`.
 
 If you run into any issues deploying to Fly, make sure you've followed all the steps above and if you have, then post
 as many details about your deployment (including your app name)
-to [the Fly support community](https://community.fly.io). They're normally pretty responsive over there and hopefully
+to [the Fly support community](https://community.fly.io). They are normally pretty responsive over there and hopefully
 can help resolve any of your deployment issues and questions.
 
 ## GitHub Actions
@@ -276,7 +353,7 @@ deployed to production after running tests/build/etc. Anything in the `dev` bran
 
 ### Cypress
 
-We use Cypress for our End-to-End tests in this project. You'll find those in the `cypress` directory. As you make
+We use Cypress for our End-to-End tests in this project. You will find those in the `cypress` directory. As you make
 changes, add to an existing file or create a new file in the `cypress/e2e` directory to test your changes.
 
 We use [`@testing-library/cypress`](https://testing-library.com/cypress) for selecting elements on the page
@@ -320,4 +397,4 @@ This project uses ESLint for linting. That is configured in `.eslintrc.js`.
 
 We use [Prettier](https://prettier.io/) for auto-formatting in this project. It's recommended to install an editor
 plugin (like the [VSCode Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))
-to get auto-formatting on save. There's also a `npm run format` script you can run to format all files in the project.
+to get auto-formatting on save. There is also a `npm run format` script you can run to format all files in the project.
