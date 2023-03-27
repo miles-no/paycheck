@@ -1,6 +1,25 @@
 import LRUCache from "lru-cache";
 import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
 
+/**
+ * LRU Cache for caching things like API responses.
+ * For example, we use this cache to prevent spamming Xledger with requests and to improve application performance.
+ *
+ * Note: This cache is not a replacement for a database.
+ * It is meant to be used for caching API responses.
+ *
+ * It is also run server-side, so it is not accessible directly from the client.
+ *
+ * The cache is set up differently for production and development environments.
+ * In development, the cache is added to the global object to persist across live reloads.
+ *
+ * Security considerations:
+ * - Since the cache is global for all requests, ensure proper access control is in place for each request.
+ * - Verify the identity and authorization of users requesting data to prevent unauthorized access.
+ * - The risk of data leakage is low in this implementation, as it's confined to server-side code.
+ * However, handle sensitive data with care, as with any server-side request.
+ */
+
 let cache: LRUCache<string, any>;
 
 // The options for the cache

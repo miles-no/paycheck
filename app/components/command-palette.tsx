@@ -1,14 +1,14 @@
-import { Fragment, useEffect, useState } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
+import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import {
   ArrowLeftOnRectangleIcon,
   ChartBarIcon,
   ClockIcon,
   HomeIcon,
   UserCircleIcon,
-  UsersIcon,
+  UsersIcon
 } from "@heroicons/react/24/outline";
+import { Fragment, useEffect, useState } from "react";
 import type { Command } from "~/root";
 
 function classNames({ classes }: { classes: any[] }) {
@@ -74,8 +74,8 @@ export default function CommandPalette(props: {
     query === ""
       ? []
       : commands.filter((person) => {
-          return person.name.toLowerCase().includes(query.toLowerCase());
-        });
+        return person.name.toLowerCase().includes(query.toLowerCase());
+      });
 
   //Keyboard shortcut to open the command palette (cmd + k)
   useEffect(() => {
@@ -154,7 +154,7 @@ export default function CommandPalette(props: {
                               classes: [
                                 "cursor-default select-none px-4 py-2",
                                 active &&
-                                  "bg-gray-200 bg-opacity-90 dark:bg-gray-700",
+                                "bg-gray-200 bg-opacity-90 dark:bg-gray-700",
                                 "flex gap-2",
                                 "dark:text-white",
                               ],

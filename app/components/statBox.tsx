@@ -14,7 +14,7 @@ export function StatBox(props: { label: string; content?: string }) {
           {props.label}
           <p
             className={
-              "mt-1 text-3xl font-semibold text-gray-900 blur-md dark:text-white"
+              "redacted mt-1 text-3xl font-semibold text-gray-900 dark:text-white"
             }
           >
             {props.content}

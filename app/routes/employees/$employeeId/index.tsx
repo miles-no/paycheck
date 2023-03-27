@@ -15,13 +15,13 @@ import {
   useTransition
 } from "@remix-run/react";
 import { Fragment, useEffect, useState } from "react";
-import { cache } from "~/cache";
 import Navbar from "~/components/navbar";
 import { Role } from "~/enums/role";
 import {
   getEmployeeDetailsByXledgerId,
   upsertEmployeeDetails
 } from "~/models/employeeDetails.server";
+import { cache } from "~/services/cache";
 import {
   getDbUserByXledgerId,
   getRole,
@@ -307,7 +307,7 @@ export function RoleSection(props: { role?: string }) {
                     ? "Kan se egne timelister."
                     : role === (Role.admin || Role.manager)
                       ? "Kan se alle ansattes timelister og endre provisjonsprosent og selvkostfaktor."
-                      : "Denna brukeren har ingen rolle. Det kan hende at brukeren ikke har logget inn enda."}
+                      : "Denne brukeren har aldri logget inn og har derfor ingen rolle."}
                 </p>
               </div>
             </div>
@@ -342,7 +342,11 @@ export function XledgerInfoSection(props: {
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
                   Navn
-                  <p className={"text-xl text-gray-900 dark:text-gray-100"}>
+                  <p
+                    className={
+                      "redacted text-xl text-gray-900 dark:text-gray-100"
+                    }
+                  >
                     {employee?.description}
                   </p>
                 </label>
@@ -351,14 +355,18 @@ export function XledgerInfoSection(props: {
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
                   Epost
-                  <p className={"text-xl text-gray-900 dark:text-gray-100"}>
+                  <p
+                    className={
+                      "redacted text-xl text-gray-900 dark:text-gray-100"
+                    }
+                  >
                     {employee?.email}
                   </p>
                 </label>
               </div>
               {/*ANSATTNUMMER*/}
               <div className="col-span-3 sm:col-span-3">
-                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+                <label className="redacted block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
                   Ansattnummer
                   <p
                     className={
@@ -388,7 +396,7 @@ export function XledgerInfoSection(props: {
                   Årsinntekt Fastlønn
                   <p
                     className={
-                      "text-xl text-gray-900 blur-md dark:text-gray-100"
+                      "redacted text-xl text-gray-900 dark:text-gray-100"
                     }
                   >
                     {Intl.NumberFormat("no-NO", {
@@ -451,9 +459,9 @@ export function ExtraVariablesSection(props: {
                   >
                     Provisjonsprosent
                   </label>
-                  <span className={"blur-md"}>
+                  <span className={"redacted"}>
                     {disabled ? (
-                      <p className="align-baseline text-4xl font-semibold text-gray-900 blur-md hover:blur-0 dark:text-gray-100">
+                      <p className="redacted align-baseline text-4xl font-semibold dark:text-gray-100">
                         {employee?.provisionPercentage * 100}{" "}
                         <span
                           className={
@@ -487,7 +495,7 @@ export function ExtraVariablesSection(props: {
                   >
                     Selvkostfaktor
                   </label>
-                  <span className={"blur-md"}>
+                  <span className={"redacted"}>
                     {disabled ? (
                       <p
                         className={

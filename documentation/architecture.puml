@@ -12,22 +12,22 @@ title Architecture overview
 ' LAYOUT_WITH_LEGEND()
 
 
-System_Boundary(c1, "Microsoft Azure") {
-        ContainerDb(Database, "Database", "")
+System_Boundary(c1, "Google Cloud Platform") {
+        ContainerDb(Database, "Database", "PostgreSQL")
 
     System_Boundary(webappSolutionBoundary,"Remix service"){
         Container(app, "WebApp", "Running in browser", "")
-        Container(remixServer, "Remix server", "", "")
+        Container(remixServer, "Remix server","Docker container")
     }
-    Container_Ext(msal, "Microsoft Authentication Library", "JWT-Token with Roles", "")
+    Container_Ext(oauth, "Google Oauth2", "Miles Internal", "")
 }
 
 Rel(app,remixServer, "HTTP-requests", "Authenticated")
-Rel(msal,app, "", "")
-Rel(app,msal, "", "")
+Rel(oauth,app, "", "")
+Rel(app,oauth, "", "")
 ' Rel(remixServer, Database, "Stores and receive calculation matrix etc", "")
+Container(Xledger, "Xledger", "GraphQL API", "Employee timesheets, yearly salary, \n\n(provision percentage, \nown cost factor, \nrole)*")
 Rel(remixServer, Xledger, "Request data from", "GraphQL API")
-
 
 Person(admin, "Admin", "")
 Person(manager, "Manager", "")
@@ -37,7 +37,7 @@ Rel(manager, app, "Uses", "Browser","Check timesheets for their employees, edit 
 Rel(employee, app, "Uses", "Browser","Check their own timesheet and what they can expect to be paid")
 Rel(admin, app, "Uses", "Browser","Access to all data, edit calculation matrix, edit employee data")
 
-Rel(remixServer, Database, "Read/Write", "SQL")
+Rel(remixServer, Database, "Read/Write User-roles & Extra Employee info", "")
 
 @enduml
 

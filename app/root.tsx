@@ -12,9 +12,9 @@ import {
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import globalStylesheetUrl from "./styles/global.css";
-import CommandPalette from "~/components/command-palette";
 import { getEmployees } from "~/services/getEmployees.server";
 import { optionalUser } from "~/services/user.server";
+import CommandPalette from "~/components/command-palette";
 
 export const links: LinksFunction = () => {
   return [

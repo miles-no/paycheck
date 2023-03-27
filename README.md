@@ -6,6 +6,22 @@ https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-databas
 
 > Version 14 is currently used in our google cloud-instance, so it is recommended to use the same version locally.
  
+## Stack:
+
+- Remix (remix.run)
+- Typescript
+- Tailwind
+- Prisma
+
+- Oath2 - Google (remix-auth-socials)
+
+- GraphQL
+- Not using any client atm. Only fetch-...
+
+
+Security:
+
+- Check if matching Google-email and the user-email set in xledger is secure.
 
 
 ## Using git-secret

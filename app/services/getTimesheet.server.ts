@@ -1,37 +1,45 @@
-import { cache } from "~/cache";
+import { cache } from "~/services/cache";
 
-export const getTimesheets = async (employeeDbId: number, date: Date) => {
-  const year = date.getFullYear();
-  const month = date.getMonth();
+export function getMonthInterval(date: Date) {
+  const newDate = new Date(date);
+  // Set timezones to UTC so that the date is the same regardless of where the user is located
+  newDate.setUTCHours(0, 0, 0, 0);
 
-  const startOfMonth = new Date(year, month, 1);
-  const startOfNextMonth = new Date(year, month + 1, 1);
-  const from = startOfMonth.toISOString().split("T")[0]; //`2023-02-01`;
-  const to = startOfNextMonth.toISOString().split("T")[0]; //`2023-03-01`;
+  const year = newDate.getUTCFullYear();
+  const month = newDate.getUTCMonth();
 
+  const startOfMonth = new Date(Date.UTC(year, month, 1));
+  const endOfMonth = new Date(Date.UTC(year, month + 1, 0));
+  const from = startOfMonth.toISOString().split("T")[0];
+  const to = endOfMonth.toISOString().split("T")[0];
+  return { from, to };
+}
+
+export function getTimesheetCacheKey(
+  employeeDbId: string,
+  from: string,
+  to: string
+) {
+  return `timesheet-${employeeDbId}-${from}-${to}`;
+}
+
+export const getTimesheets = async (employeeDbId: string, date: Date) => {
+  const { from, to } = getMonthInterval(date);
   // use cache if available
-  const cacheKey = `timesheet-${employeeDbId}-${from}-${to}`;
-  if (cache.has(cacheKey))
+  const cacheKey = getTimesheetCacheKey(employeeDbId, from, to);
+  if (cache.has(cacheKey)) {
+    console.log("Using cached timesheet", cacheKey);
     return cache.get(cacheKey) as XLedgerGraphQLTimesheetQueryResponse;
+  }
 
-  console.log("Fetching timesheet from XLedger API");
+  console.log("Fetching timesheet from XLedger API", cacheKey);
 
   let timesheets: Node[] = [];
   let hasNextPage = true;
   let endCursor = null;
 
   let iteration = 0;
-
-  while (hasNextPage) {
-    iteration++;
-    const response = await fetch(`${process.env.XLEDGER_GRAPHQL_URL}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `token ${process.env.XLEDGER_TOKEN}`,
-      },
-      body: JSON.stringify({
-        query: `
+  const query = `
             query GetTimesheets($first: Int!, $after: String) {
               timesheets(first: $first, after: $after, filter: {employeeDbId: ${employeeDbId}, assignmentDate_gte: "${from}", assignmentDate_lt: "${to}"}, orderBy: {field: ASSIGNMENT_DATE, direction: ASC}) {
                 pageInfo {
@@ -56,7 +64,18 @@ export const getTimesheets = async (employeeDbId: number, date: Date) => {
                 }
               }
             }
-          `,
+          `;
+  console.log("query", query);
+  while (hasNextPage) {
+    iteration++;
+    const response = await fetch(`${process.env.XLEDGER_GRAPHQL_URL}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${process.env.XLEDGER_TOKEN}`,
+      },
+      body: JSON.stringify({
+        query: query,
         variables: { first: 100, after: endCursor },
       }),
     });

@@ -1,14 +1,19 @@
 import type { EmployeeDetails, Role, User } from ".prisma/client";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
-import type { LoaderArgs } from "@remix-run/node";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import type { LoaderArgs, ActionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { Form, useLoaderData, useParams } from "@remix-run/react";
 import Navbar from "~/components/navbar";
 import { TimeSheetNav } from "~/components/timeSheetNav";
 import { getEmployeeDetailsByXledgerId } from "~/models/employeeDetails.server";
 import { getXledgerEmployeeData } from "~/routes/employees/$employeeId";
+import { cache } from "~/services/cache";
 import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
-import { getTimesheets } from "~/services/getTimesheet.server";
+import {
+  getMonthInterval,
+  getTimesheetCacheKey,
+  getTimesheets,
+} from "~/services/getTimesheet.server";
 import { requireUser } from "~/services/user.server";
 import { aggregateProjectSummary } from "~/utils/aggregateProjectSummary.server";
 import { calculateMonthlyPayFromSubTotal } from "~/utils/calculateMonthlyPayFromTimesheet";
@@ -39,9 +44,10 @@ export async function loader({ params, context, request }: LoaderArgs) {
       return redirect("/403");
   }
 
+  //Todo: Double check that we are fetching the correct timesheet
   const timesheets = await getTimesheets(
-    Number(employeeId),
-    new Date(Number(year), Number(month) - 1)
+    `${employeeId}`,
+    new Date(Number(year), Number(month))
   );
   if (!timesheets) throw new Error("No timesheets found");
 
@@ -83,7 +89,34 @@ export async function loader({ params, context, request }: LoaderArgs) {
   return json({ timesheets, monthlyPay, totalByProject, mainProject, user });
 }
 
-export default function Example() {
+export const action = async ({ request, params }: ActionArgs) => {
+  const { employeeId, year, month } = params;
+
+  // Check if user is allowed to trigger this action
+  const user = await requireUser(request);
+  if (!user) return redirect("/login");
+  if (user.role.name === ("admin" || "manager")) {
+    // good to go
+  } else {
+    // Check if user is allowed to view this page
+    if (user.employeeDetails && user.employeeDetails.xledgerId !== employeeId)
+      return redirect("/403");
+  }
+
+  if (!employeeId || !year || !month) return redirect("/404");
+
+  const { from, to } = getMonthInterval(new Date(Number(year), Number(month)));
+
+  // use cache if available
+  const cacheKey = getTimesheetCacheKey(employeeId, from, to);
+  if (cache.has(cacheKey)) {
+    cache.delete(cacheKey);
+    return redirect(`/employees/${employeeId}/timesheets/${year}/${month}`);
+  }
+  return null;
+};
+
+export default function MonthlyTimesheetPage() {
   const { monthlyPay, totalByProject, mainProject, user } =
     useLoaderData<typeof loader>();
 
@@ -116,107 +149,106 @@ export default function Example() {
               </p>
             </div>
           </div>
-          <div>
-            <table className={"mt-4 w-full"}>
-              <thead className={"border-b border-gray-200"}>
-                <tr
-                  className={
-                    "border-b border-gray-200 text-gray-900 dark:text-gray-200"
-                  }
-                >
+          <div className={"-mx-4 mt-8 flow-root sm:mx-0"}>
+            <table className={"min-w-full divide-y divide-gray-300"}>
+              <thead>
+                <tr>
                   <th
-                    className={
-                      "py-3.5 px-3 text-left text-sm font-semibold sm:table-cell"
-                    }
+                    scope="col"
+                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-0"
                   >
                     Prosjekt
                   </th>
                   <th
-                    className={
-                      "py-3.5 px-3 text-left text-sm font-semibold sm:table-cell"
-                    }
+                    scope="col"
+                    className="hidden py-3.5 px-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-500 md:table-cell"
                   >
                     Forklaring
                   </th>
                   <th
+                    scope={"col"}
                     className={
-                      "py-3.5 px-3 text-right text-sm font-semibold sm:table-cell"
+                      "hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 dark:text-gray-500 md:table-cell"
                     }
                   >
                     Timer
                   </th>
                   <th
+                    scope={"col"}
                     className={
-                      "py-3.5 px-3 text-right text-sm font-semibold sm:table-cell"
+                      "hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 dark:text-gray-500 md:table-cell"
                     }
                   >
                     Rate
                   </th>
                   <th
+                    scope={"col"}
                     className={
-                      "py-3.5 px-3 text-right text-sm font-semibold sm:table-cell"
+                      "dark: py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-500 sm:pr-0"
                     }
                   >
                     Sum
                   </th>
                 </tr>
               </thead>
-              <tbody className={"border-b border-gray-200"}>
+              <tbody>
                 {totalByProject.length > 0 ? (
                   Object.values(totalByProject).map(
-                    ({ hours, id, name, rate, sum, explanation }) => (
-                      <tr
-                        key={name}
-                        className={
-                          "border-b border-gray-200 text-gray-500 dark:text-gray-200"
-                        }
-                      >
+                    ({ hours, name, rate, sum, explanation }) => (
+                      <tr key={name} className={"border-b border-gray-300"}>
+                        <td className={"py-4 pl-4 pr-3 text-sm sm:pl-0"}>
+                          <p
+                            className={
+                              "font-medium text-gray-900 dark:text-gray-100"
+                            }
+                          >
+                            {name}
+                          </p>
+                          <p className={"mt-0.5 text-gray-500 md:hidden"}>
+                            {mainProject?.name === name
+                              ? "Hovedprosjekt"
+                              : explanation
+                              ? `${explanation}`
+                              : ""}
+                          </p>
+                          <p className={"mt-0.5 text-gray-500 md:hidden"}>
+                            {Intl.NumberFormat("nb-NO", {
+                              style: "decimal",
+                              maximumFractionDigits: 2,
+                            }).format(hours)}{" "}
+                            *{" "}
+                            {Intl.NumberFormat("nb-NO", {
+                              style: "currency",
+                              currency: "NOK",
+                              maximumFractionDigits: 2,
+                            }).format(rate)}
+                          </p>
+                        </td>
                         <td
                           className={
-                            "py-4 px-3 text-left text-sm blur-md sm:table-cell"
+                            "hidden py-4 px-3 text-sm text-gray-500 md:table-cell"
                           }
                         >
-                          <p>{name}</p>
+                          {mainProject?.name === name
+                            ? "Hovedprosjekt"
+                            : explanation
+                            ? `${explanation}`
+                            : ""}
                         </td>
-                        <td className="py-4 px-3 text-left text-sm text-gray-400">
-                          {mainProject?.name === name ? (
-                            <span className={"flex gap-2"}>
-                              <CheckBadgeIcon
-                                className={"h-5"}
-                                title={"Hovedprosjekt"}
-                              />
-                              <p>Hovedprosjekt</p>
-                            </span>
-                          ) : explanation ? (
-                            <p>{explanation}</p>
-                          ) : null}
-                        </td>
-                        <td
-                          className={
-                            "redacted py-4 px-3 text-right text-sm sm:table-cell"
-                          }
-                        >
+                        <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell">
                           {Intl.NumberFormat("nb-NO", {
                             style: "decimal",
                             maximumFractionDigits: 2,
                           }).format(hours)}
                         </td>
-                        <td
-                          className={
-                            "redacted py-4 px-3 text-right text-sm sm:table-cell"
-                          }
-                        >
+                        <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell">
                           {Intl.NumberFormat("nb-NO", {
                             style: "currency",
                             currency: "NOK",
                             maximumFractionDigits: 2,
                           }).format(rate)}
                         </td>
-                        <td
-                          className={
-                            "py-4 px-3 text-right text-sm sm:table-cell"
-                          }
-                        >
+                        <td className="py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">
                           {Intl.NumberFormat("nb-NO", {
                             style: "currency",
                             currency: "NOK",
@@ -227,48 +259,47 @@ export default function Example() {
                     )
                   )
                 ) : (
-                  <tr
-                    className={
-                      "border-b border-gray-200 bg-gray-100 text-gray-500 dark:bg-gray-900 dark:text-gray-200"
-                    }
-                  >
-                    <td className={"py-4 px-3 text-left text-sm sm:table-cell"}>
+                  <tr>
+                    <td
+                      className={"font-medium text-gray-900 dark:text-gray-100"}
+                    >
                       Ingen timer ført i denne perioden
                     </td>
                     <td
                       className={
-                        "emptyCell py-4 px-3 text-left text-sm sm:table-cell"
+                        "hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell"
                       }
                     ></td>
-                    <td
-                      className={
-                        "emptyCell py-4 px-3 text-right text-sm sm:table-cell"
-                      }
-                    ></td>
-                    <td
-                      className={
-                        "emptyCell py-4 px-3 text-right text-sm sm:table-cell"
-                      }
-                    ></td>
-                    <td
-                      className={
-                        "emptyCell py-4 px-3 text-right text-sm sm:table-cell"
-                      }
-                    ></td>
+                    <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell"></td>
+                    <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell"></td>
+                    <td className="py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0"></td>
                   </tr>
                 )}
               </tbody>
-              <tfoot className={"text-gray-900 dark:text-gray-200"}>
-                <tr className={"border-b border-gray-200"}>
+              <tfoot>
+                <tr>
                   <th
+                    scope={"row"}
                     colSpan={4}
                     className={
-                      "py-3.5 px-3 text-right text-sm font-semibold sm:table-cell"
+                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
                     }
                   >
                     Subtotal
                   </th>
-                  <td className={"py-4 px-3 text-right text-sm sm:table-cell"}>
+                  <th
+                    scope={"row"}
+                    className={
+                      "pl-6 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:hidden"
+                    }
+                  >
+                    Subtotal
+                  </th>
+                  <td
+                    className={
+                      "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                    }
+                  >
                     {Intl.NumberFormat("nb-NO", {
                       style: "currency",
                       currency: "NOK",
@@ -278,14 +309,27 @@ export default function Example() {
                 </tr>
                 <tr>
                   <th
+                    scope={"row"}
                     colSpan={4}
                     className={
-                      "py-3.5 px-3 text-right text-sm font-semibold sm:table-cell"
+                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
                     }
                   >
                     Provisjon
                   </th>
-                  <td className={"py-4 px-3 text-right text-sm sm:table-cell"}>
+                  <th
+                    scope={"row"}
+                    className={
+                      "pl-6 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:hidden"
+                    }
+                  >
+                    Provisjon
+                  </th>
+                  <td
+                    className={
+                      "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                    }
+                  >
                     {Intl.NumberFormat("nb-NO", {
                       style: "currency",
                       currency: "NOK",
@@ -293,16 +337,29 @@ export default function Example() {
                     }).format(monthlyPay.provision)}
                   </td>
                 </tr>
-                <tr className={"border-b border-gray-200"}>
+                <tr>
                   <th
+                    scope={"row"}
                     colSpan={4}
                     className={
-                      "py-3.5 px-3 text-right text-sm font-semibold sm:table-cell"
+                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
                     }
                   >
                     Fastlønn
                   </th>
-                  <td className={"py-4 px-3 text-right text-sm sm:table-cell"}>
+                  <th
+                    scope={"row"}
+                    className={
+                      "pl-6 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:hidden"
+                    }
+                  >
+                    Fastlønn
+                  </th>
+                  <td
+                    className={
+                      "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                    }
+                  >
                     {Intl.NumberFormat("nb-NO", {
                       style: "currency",
                       currency: "NOK",
@@ -312,14 +369,27 @@ export default function Example() {
                 </tr>
                 <tr>
                   <th
+                    scope={"row"}
                     colSpan={4}
                     className={
-                      "py-3.5 px-3 text-right text-sm font-semibold sm:table-cell"
+                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100 md:table-cell md:pl-0"
                     }
                   >
                     Totalt
                   </th>
-                  <td className={"py-4 px-3 text-right text-sm sm:table-cell"}>
+                  <th
+                    scope={"row"}
+                    className={
+                      "pl-6 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 md:hidden"
+                    }
+                  >
+                    Totalt
+                  </th>
+                  <td
+                    className={
+                      "pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100 md:pr-0"
+                    }
+                  >
                     {Intl.NumberFormat("nb-NO", {
                       style: "currency",
                       currency: "NOK",
@@ -329,16 +399,28 @@ export default function Example() {
                 </tr>
               </tfoot>
             </table>
-            <div className={"flex justify-end"}>
-              <a
-                href={`/employees/${employeeId}`}
-                className={"ml-4 p-2 text-sm text-gray-500"}
-              >
-                Endre variabler
-              </a>
-            </div>
+          </div>
+          <div className="mt-6 flex justify-end">
+            <a
+              href={`/employees/${employeeId}`}
+              className={"text-sm text-gray-500"}
+            >
+              Endre variabler
+            </a>
           </div>
         </div>
+        <Form
+          method="post"
+          className={"flex justify-center px-4 pt-8 sm:px-6 lg:px-8"}
+        >
+          <button
+            className={"flex gap-2 text-gray-500 dark:text-gray-400"}
+            type="submit"
+          >
+            <ArrowPathIcon className={"h-6 w-6"} />
+            <p>Force refresh</p>
+          </button>
+        </Form>
       </main>
     </>
   );

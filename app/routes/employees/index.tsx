@@ -46,9 +46,9 @@ export default function IndexPage() {
                 key={employee.dbId}
                 className="overflow-hidden bg-white bg-opacity-50 shadow dark:border dark:border-gray-500 dark:bg-black dark:bg-opacity-40 sm:rounded-lg"
               >
-                <div className="flex justify-between p-2 sm:p-5">
+                <div className="redacted flex justify-between p-2 sm:p-5">
                   <span>
-                    <h3 className="text-lg font-medium leading-6 text-gray-900 blur dark:text-white">
+                    <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                       {employee.description}
                     </h3>
                     <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">

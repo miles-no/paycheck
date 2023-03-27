@@ -13,9 +13,14 @@ export function TimeSheetNav(props: {
   const { employeeId, year, month } = props;
   return (
     <>
-      <p className={"text-center font-mono text-xl"}>{year}</p>
+      <p className={"mt-4 text-center font-mono text-xl capitalize"}>
+        {new Date(Number(year), Number(month) - 1).toLocaleString("nb-NO", {
+          month: "long",
+        })}{" "}
+        {year}
+      </p>
       <nav className="hideInPrint m-4 flex">
-        <div className=" flex flex-1">
+        <div className="flex flex-1">
           <a
             href={`/employees/${employeeId}/timesheets/${getPreviousMonthLink(
               year,
@@ -30,18 +35,18 @@ export function TimeSheetNav(props: {
             Forrige måned
           </a>
         </div>
-        <div className="hidden md:-mt-px md:flex">
+        <div className="hidden lg:-mt-px lg:flex">
           {[...Array(12).keys()].map((monthy) => (
             <a
               key={monthy}
               href={`/employees/${employeeId}/timesheets/${year}/${monthy + 1}`}
-              className={`inline-flex items-center border-b-2 border-transparent px-1 pt-4 text-sm font-medium text-gray-500 
-              hover:text-gray-900 dark:hover:text-gray-100
+              className={`inline-flex items-center border-b-2 border-transparent px-1 pt-4 text-sm font-medium
+              capitalize text-gray-500 hover:text-gray-900 dark:hover:text-gray-100
               ${
                 monthy === Number(month) - 1
                   ? "border-gray-900 text-gray-900 dark:border-gray-100 dark:text-gray-100"
                   : ""
-              }    
+              }
               `}
             >
               {new Date(Number(year), monthy).toLocaleString("nb-NO", {
@@ -50,7 +55,6 @@ export function TimeSheetNav(props: {
             </a>
           ))}
         </div>
-
         <div className="flex flex-1 justify-end">
           <a
             href={

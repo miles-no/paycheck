@@ -1,8 +1,8 @@
-import { Fragment } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useLocation } from "react-router";
 import type { EmployeeDetails, Role, User } from ".prisma/client";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Fragment } from "react";
+import { useLocation } from "react-router";
 import { Role as RoleEnum } from "~/enums/role";
 
 const userNavigation = [
@@ -44,7 +44,7 @@ export default function Navbar(props: {
   return (
     <Disclosure
       as="header"
-      className="bg-white bg-opacity-30 dark:bg-black dark:bg-opacity-90"
+      className="bg-white bg-opacity-30 shadow dark:bg-black dark:bg-opacity-90"
     >
       {({ open }) => (
         <>
@@ -61,7 +61,7 @@ export default function Navbar(props: {
               </div>
               <div className="relative z-10 flex items-center lg:hidden">
                 {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md border border-transparent p-2 text-gray-400 hover:border-white hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                   <span className="sr-only">Open menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -124,7 +124,7 @@ export default function Navbar(props: {
                   className={classNames(
                     location.pathname === item.href
                       ? "border-b border-black bg-opacity-50 font-bold text-gray-900 dark:border-gray-700 dark:text-gray-300"
-                      : "border-b border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:border-gray-700 dark:hover:text-gray-300",
+                      : "border-b border-transparent text-gray-500 hover:border-gray-300 dark:hover:border-gray-700 dark:hover:text-gray-300",
                     "inline-flex items-center py-2 px-3 text-sm font-medium"
                   )}
                   aria-current={
@@ -147,7 +147,7 @@ export default function Navbar(props: {
                   className={classNames(
                     location.pathname === item.href
                       ? "bg-gray-900 text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                      : "text-gray-500",
                     "block rounded-md py-2 px-3 text-base font-medium"
                   )}
                   aria-current={
@@ -168,20 +168,13 @@ export default function Navbar(props: {
                   />
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium text-white">
+                  <div className="text-base font-medium text-gray-500 dark:text-gray-400">
                     {props.user?.name}
                   </div>
-                  <div className="text-sm font-medium text-gray-400">
+                  <div className="text-sm font-medium text-gray-400 dark:text-gray-500">
                     {props.user?.email}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
               </div>
               <div className="mt-3 space-y-1 px-2">
                 {userNavigation.map((item) => (
@@ -189,7 +182,7 @@ export default function Navbar(props: {
                     key={item.name}
                     as="a"
                     href={item.href}
-                    className="block rounded-md py-2 px-3 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                    className="block rounded-md py-2 px-3 text-base font-medium text-gray-500"
                   >
                     {item.name}
                   </Disclosure.Button>

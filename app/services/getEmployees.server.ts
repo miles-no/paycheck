@@ -1,4 +1,4 @@
-import { cache } from "~/cache";
+import { cache } from "~/services/cache";
 
 /**
  * Get employees from Xledger

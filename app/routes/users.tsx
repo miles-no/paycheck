@@ -1,4 +1,4 @@
-import { EmployeeDetails, Role, User } from ".prisma/client";
+import type { EmployeeDetails, Role, User } from ".prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -154,7 +154,7 @@ export default function UsersPage() {
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                         <a
                           href={`/employees/${person.employeeDetails?.xledgerId}`}
-                          className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                          className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
                         >
                           Edit<span className="sr-only">, {person.name}</span>
                         </a>
