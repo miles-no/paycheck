@@ -31,7 +31,7 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "Miles Timesheets",
+  title: "Miles PayCheck",
   viewport: "width=device-width,initial-scale=1",
 });
 
@@ -96,7 +96,7 @@ export default function App() {
       <head>
         <Meta />
         <Links />
-        <title>Miles Timesheets</title>
+        <title>Miles PayCheck</title>
       </head>
       <body className="h-full bg-gray-100 dark:bg-black dark:text-white">
         {commands.length > 0 && (

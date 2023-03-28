@@ -82,7 +82,7 @@ export default function Index() {
                     className="mx-auto mt-16 w-full max-w-[12rem] pb-2 md:max-w-[16rem]"
                   />
                   <span className="sr-only">Miles</span>
-                  <span className="uppercase drop-shadow-md">Timesheets</span>
+                  <span className="uppercase drop-shadow-md">PayCheck</span>
                 </h1>
 
                 <div className="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">

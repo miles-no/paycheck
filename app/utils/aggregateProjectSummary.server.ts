@@ -1,4 +1,4 @@
-import { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
+import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
 
 /**
  * Aggregates the timesheet timesheetQueryResponse by project and sums up the hours worked and the sum earned.

@@ -3,7 +3,7 @@ import { Transition } from "@headlessui/react";
 import {
   CheckCircleIcon,
   XCircleIcon,
-  XMarkIcon
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
@@ -12,21 +12,21 @@ import {
   Link,
   useActionData,
   useLoaderData,
-  useTransition
+  useTransition,
 } from "@remix-run/react";
 import { Fragment, useEffect, useState } from "react";
 import Navbar from "~/components/navbar";
 import { Role } from "~/enums/role";
 import {
   getEmployeeDetailsByXledgerId,
-  upsertEmployeeDetails
+  upsertEmployeeDetails,
 } from "~/models/employeeDetails.server";
 import { cache } from "~/services/cache";
 import {
   getDbUserByXledgerId,
   getRole,
   requireAdminOrManager,
-  requireUser
+  requireUser,
 } from "~/services/user.server";
 import { isAdminOrManager } from "~/utils/isAdminOrManager";
 
@@ -232,9 +232,11 @@ export default function EmployeeEditPage() {
           />
           <div className="mt-5 md:col-span-2 md:mt-0">
             <Link
-              to={`/employees/${employee.xledgerId
-                }/timesheets/${new Date().getFullYear()}/${new Date().getMonth() + 1
-                }`}
+              to={`/employees/${
+                employee.xledgerId
+              }/timesheets/${new Date().getFullYear()}/${
+                new Date().getMonth() + 1
+              }`}
               className="text-gray-900 underline hover:text-gray-600 dark:text-gray-100 dark:hover:text-gray-200"
             >
               Timeliste
@@ -276,7 +278,7 @@ export function RoleSection(props: { role?: string }) {
     <div className="md:grid md:grid-cols-3 md:gap-6">
       <ExplanationHeader
         title="Rolle"
-        description="Dette er rollen til brukeren i Miles Timesheets."
+        description="Dette er rollen til brukeren i Miles PayCheck."
       />
       <div className="mt-5 md:col-span-2 md:mt-0">
         <div className="overflow-hidden shadow sm:rounded-md">
@@ -306,8 +308,8 @@ export function RoleSection(props: { role?: string }) {
                   {role === Role.employee
                     ? "Kan se egne timelister."
                     : role === (Role.admin || Role.manager)
-                      ? "Kan se alle ansattes timelister og endre provisjonsprosent og selvkostfaktor."
-                      : "Denne brukeren har aldri logget inn og har derfor ingen rolle."}
+                    ? "Kan se alle ansattes timelister og endre provisjonsprosent og selvkostfaktor."
+                    : "Denne brukeren har aldri logget inn og har derfor ingen rolle."}
                 </p>
               </div>
             </div>

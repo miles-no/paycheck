@@ -1,16 +1,28 @@
-# Miles Timesheets: Payroll Transparency and Accuracy
+# Miles PayCheck: Payroll Transparency and Accuracy
 
-Miles Timesheets aims to provide employees with a clear and comprehensive understanding of their payroll. The majority of consultants at Miles receive provision-based pay with a base amount, which can vary depending on the project and individual circumstances.
+Miles PayCheck aims to provide employees with a clear and comprehensive understanding of their payroll. The majority of
+consultants at Miles receive provision-based pay with a base amount, which can vary depending on the project and
+individual circumstances.
 
-The challenge arises when employees work on projects without a set rate or those not invoiced to customers, but still need to generate provisions. For example, an employee might have a sick child and require leave for a few days each month or work on internal projects. In many cases, the employees should be compensated the same as their main-project for that work.
+The challenge arises when employees work on projects without a set rate or those not invoiced to customers, but still
+need to generate provisions. For example, an employee might have a sick child and require leave for a few days each
+month or work on internal projects. In many cases, the employees should be compensated the same as their main-project
+for that work.
 
-Additionally, some employees may be involved in multiple projects, complicating the calculation of provisions. The payroll system needs to determine the main project's rate, which may not be immediately clear from the financial records in Xledger.
+Additionally, some employees may be involved in multiple projects, complicating the calculation of provisions. The
+payroll system needs to determine the main project's rate, which may not be immediately clear from the financial records
+in Xledger.
 
-Miles Timesheets addresses these challenges by making payroll transparent for employees and reducing the error rate before invoicing customers. This ensures that employees have accurate and up-to-date information about their pay, and customers are billed correctly, regardless of the nature of their projects.
+Miles PayCheck addresses these challenges by making payroll transparent for employees and reducing the error rate before
+invoicing customers. This ensures that employees have accurate and up-to-date information about their pay, and customers
+are billed correctly, regardless of the nature of their projects.
 
-Furthermore, Miles Timesheets provides managers and admins with the ability to review all employees' timesheets, offering a comprehensive overview of invoiced amounts versus pay. This enables them to monitor the company's financial health and assist in making informed decisions for future projections and planning.
+Furthermore, Miles PayCheck provides managers and admins with the ability to review all employees' timesheets, offering
+a comprehensive overview of invoiced amounts versus pay. This enables them to monitor the company's financial health and
+assist in making informed decisions for future projections and planning.
 
-- [Miles Timesheets: Payroll Transparency and Accuracy](#miles-timesheets-payroll-transparency-and-accuracy)
+- [Miles PayCheck: Payroll Transparency and Accuracy](#miles-paycheck-payroll-transparency-and-accuracy)
+  - [Getting started](#getting-started)
   - [Architecture](#architecture)
   - [Environment variables](#environment-variables)
   - [Local database](#local-database)
@@ -44,10 +56,10 @@ Furthermore, Miles Timesheets provides managers and admins with the ability to r
 
 1. Install dependencies
    `npm install`
-2. Setup database 
+2. Setup database
    For example a [Local database](#local-database)
 3. Setup environment variables
-    See section [Environment variables](#environment-variables)
+   See section [Environment variables](#environment-variables)
 4. Run the project
    `npm run dev`
 
@@ -87,7 +99,7 @@ GOOGLE_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxx"
 
 ## Local database
 
-https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database
+<https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database>
 
 > Version 14 is currently used in our Google cloud-instance, so it is recommended to use the same version locally.
 
@@ -101,14 +113,14 @@ This should be done in every `loader` and `action`.
 
 ## Design
 
-http://remix.run/docs/en/1.14.3/guides/styling
+<http://remix.run/docs/en/1.14.3/guides/styling>
 
 ### Tailwind
 
 Tailwind has been chosen since it generates pure css in the end.
 You may still write some CSS...
 I can recommend looking at tailwind-ui-components for learning best-practices with regard to UX.
-See tailwind-ui https://tailwindui.com/components
+See tailwind-ui <https://tailwindui.com/components>
 
 ### Mobile first
 
@@ -116,7 +128,7 @@ Try to keep the users in mind when designing components.
 Most users will be using mobile devices.
 
 Using tailwind, start with mobile, then think about how it will look on larger devices, adding `sm:`, and `md:` etc...
-https://tailwindcss.com/docs/responsive-design#working-mobile-first
+<https://tailwindcss.com/docs/responsive-design#working-mobile-first>
 
 ### Dark mode
 
@@ -176,7 +188,7 @@ We can then calculate the pay for an employee as follows:
 The following tasks have special rules for calculating the pay:
 
 | Code  | Task                   | Comment               |
-| ----- | ---------------------- | --------------------- |
+|-------|------------------------|-----------------------|
 | S-101 | Fagsamtaler            | "Main project"        |
 | S-102 | Faglig intervju        | 1000 kr an hour       |
 | S-103 | Bistand innsalg        | "Main project"        |

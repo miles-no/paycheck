@@ -47,7 +47,7 @@ Rel(remixServer, Database, "Read/Write User-roles & Extra Employee info", "")
 ' Each employe has the following variables that affect the payment calculation:
 ' - Yearly salary ( Normally 600 000 )
 ' - Own cost factor ( normally 1.5 )
-' - Provision percentage ( varies the most ) 
+' - Provision percentage ( varies the most )
 
 ' So basicly just the provision percentage is needed to calculate the payment for each employee.
 
