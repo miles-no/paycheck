@@ -67,8 +67,8 @@ export const getEmployees = async () => {
     }
   }
   const sortedEmployees = employees.sort((a, b) => {
-    const aName = a.description.toLowerCase();
-    const bName = b.description.toLowerCase();
+    const aName = a.description ? a.description.toLowerCase() : "";
+    const bName = b.description ? b.description.toLowerCase() : "";
     if (aName < bName) return -1;
     if (aName > bName) return 1;
     return 0;
