@@ -1,0 +1,70 @@
+image: atlassian/default-image:3
+
+definitions:
+  services:
+    docker-6g:
+      type: docker
+      memory: 6144
+
+pipelines:
+  pull-requests:
+    '**':
+    - step:
+        name: Lint the Dockerfile
+        image: hadolint/hadolint:latest-debian
+        script:
+        - hadolint Dockerfile
+    - step:
+        size: 2x
+        name: Build Docker Image
+        script:
+        - IMAGE_NAME=$BITBUCKET_REPO_SLUG
+        - docker build . --file Dockerfile --tag ${ECR_REPOSITORY}
+        services:
+        - docker-6g
+        caches:
+        - docker
+  branches:
+    dev:
+    - step:
+        size: 2x
+        name: Build Docker Image
+        script:
+        - IMAGE_NAME=$BITBUCKET_REPO_SLUG
+        - docker build . --file Dockerfile --tag ${ECR_REPOSITORY} -m 6g
+        - docker save ${ECR_REPOSITORY} --output "${IMAGE_NAME}.tar"
+        services:
+        - docker-6g
+        caches:
+        - docker
+        artifacts:
+        - "*.tar"
+    - step:
+        name: Deploy to Staging
+        services:
+        - docker
+        deployment: Staging
+        script:
+        - apt-get update && apt-get install -y python3-pip --no-install-recommends
+        - pip3 install -U awscli
+        - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
+        - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
+        - aws configure set region "${AWS_DEFAULT_REGION}"
+        - IMAGE_NAME=$BITBUCKET_REPO_SLUG
+        - docker load --input "${IMAGE_NAME}.tar"
+        - docker tag "${ECR_REPOSITORY}" "${ECR_REPOSITORY}:${BITBUCKET_COMMIT}"
+        - docker tag "${ECR_REPOSITORY}" "${ECR_REPOSITORY}:latest"
+        - eval $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}" | sed 's;https://;;g')
+        - docker push "${ECR_REPOSITORY}:${BITBUCKET_COMMIT}"
+        - docker push "${ECR_REPOSITORY}:latest"
+        - export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+        - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+        - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+        - export ECS_SERVICE_NAME=$DEV_ECS_SERVICE_NAME
+        - export ECS_CLUSTER_NAME=$DEV_ECS_CLUSTER_NAME
+        - export ECR_IMAGE_URI="${ECR_REPOSITORY}:${BITBUCKET_COMMIT}"
+        - export ASPNETCORE_ENVIRONMENT='Development'
+        - export ECS_CPU=$DEV_ECS_CPU
+        - export ECS_MEMORY=$DEV_ECS_MEMORY
+        - ./cicd/entrypoint.sh
+        - "curl -X POST \"https://api.cloudflare.com/client/v4/zones/37e096943b18f281d3bb669c42388ff9/purge_cache\" -H \"Authorization: Bearer ${CF_TOKEN}\" -H 'Content-Type:application/json' -d '{\"purge_everything\":true}'"
