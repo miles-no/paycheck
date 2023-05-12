@@ -80,7 +80,7 @@ function get_current_taskdef() {
   current_taskdef_arn=$(aws ecs describe-services --services "$ECS_SERVICE_NAME" --cluster "$ECS_CLUSTER_NAME" | jq -r '.services[0].taskDefinition')
 #   echo "$current_taskdef_arn"
   current_taskdef=$(aws ecs describe-task-definition --task-definition "$current_taskdef_arn" | jq '.taskDefinition')
-  echo "$current_taskdef"
+#   echo "$current_taskdef"
   last_used_taskdef_arn="$current_taskdef_arn"
   ECS_TASKDEF_FAMILY=$(echo "$current_taskdef" | jq -r '.family')
   p_ok
@@ -113,8 +113,7 @@ function create_new_taskdef() {
     executionRoleArn: .executionRoleArn, \
     requiresCompatibilities: .requiresCompatibilities, \
     cpu: .cpu, \
-    memory: .memory, \
-    taskRoleArn: .taskRoleArn
+    memory: .memory
   "
   new_def=$(echo "$taskdef" | jq "{${jq_filter}}")
   echo "$new_def"
