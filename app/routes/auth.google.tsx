@@ -7,8 +7,12 @@ export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData();
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
 
-  return await authenticator.authenticate(SocialsProvider.GOOGLE, request, {
-    successRedirect: redirectTo,
-    failureRedirect: "/",
-  });
+  try {
+    return await authenticator.authenticate(SocialsProvider.GOOGLE, request, {
+      successRedirect: redirectTo,
+      failureRedirect: "/",
+    });
+  } catch (error) {
+    console.log("error on login", error);
+  }
 };
