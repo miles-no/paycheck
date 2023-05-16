@@ -15,10 +15,12 @@ async function handleSocialAuthCallback({
 }: {
   profile: GoogleProfile;
 }) {
+  console.log("1");
   const employees = await getEmployees();
   const xledgerEmployeeMatch = employees.find(
     (employee) => employee.email === profile.emails[0].value
   );
+  console.log("2");
   if (!xledgerEmployeeMatch) {
     throw new Error(
       "No Xledger employee found with email " + profile.emails[0].value
@@ -33,6 +35,7 @@ async function handleSocialAuthCallback({
 
   invariant(defaultRole, "No default role found");
 
+  console.log("3");
   const res = await prisma.user.upsert({
     where: {
       googleId: profile.id,

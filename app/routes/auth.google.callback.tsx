@@ -6,7 +6,7 @@ export async function loader({ params, context, request }: LoaderArgs) {
   try {
     return authenticator.authenticate(SocialsProvider.GOOGLE, request, {
       successRedirect: "/profile",
-      failureRedirect: "/",
+      failureRedirect: "/error",
     });
   } catch (error) {
     console.log("error on callback", error);
