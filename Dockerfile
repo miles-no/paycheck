@@ -34,8 +34,6 @@ COPY --from=deps /myapp/node_modules /myapp/node_modules
 ADD prisma .
 RUN npx prisma generate
 
-RUN npx prisma migrate dev
-
 ADD . .
 RUN npm run build
 
@@ -59,5 +57,7 @@ COPY --from=build /myapp/public /myapp/public
 COPY --from=build /myapp/package.json /myapp/package.json
 COPY --from=build /myapp/start.sh /myapp/start.sh
 COPY --from=build /myapp/prisma /myapp/prisma
+
+RUN npx prisma migrate deploy
 
 CMD [ "npm", "run", "start" ]
