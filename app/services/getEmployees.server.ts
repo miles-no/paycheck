@@ -18,7 +18,7 @@ export const getEmployees = async () => {
   const formattedFrom = from.toISOString().split("T")[0]; // 2021-03-01
 
   // Check cache first
-  if (cache?.has("employees")) {
+  if (cache.has("employees")) {
     console.log("Using cached employees");
     return cache.get("employees") as Employee[];
   }
