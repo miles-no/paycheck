@@ -1,3 +1,3 @@
 set -ex
-npx prisma migrate deploy
+npm run prisma migrate dev
 npm run start
