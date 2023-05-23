@@ -32,6 +32,7 @@ async function handleSocialAuthCallback({
       name: Role.employee,
     },
   });
+  console.log("defaultRole", defaultRole);
 
   invariant(defaultRole, "No default role found");
 
