@@ -1,7 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { Role } from "~/enums/role";
 
 const prisma = new PrismaClient();
+
+enum Role {
+  admin = "admin",
+  manager = "manager",
+  employee = "employee",
+}
 
 async function seed() {
   console.log(`Creating roles... 🌱`);
