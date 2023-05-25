@@ -17,7 +17,7 @@ p_ok() { printf "âœ“ $(date '+%H:%M:%S') |   OK %s\n" "$@"
 }
 
 declare -xr AWS_DEFAULT_OUTPUT="json"
-declare -r TIMEOUT=300
+declare -r TIMEOUT=600
 declare -r MAX_TASKDEFS=10
 declare -x ECS_TASKDEF_FAMILY=""
 
