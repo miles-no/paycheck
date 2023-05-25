@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -ex
-
 echo "Current working directory:"
 pwd
 

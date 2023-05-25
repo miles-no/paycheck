@@ -32,7 +32,7 @@ async function seed() {
 
 seed()
   .catch((e) => {
-    console.error(e);
+    console.log(e); // TODO: Handle exception nicer
     process.exit(0);
   })
   .finally(async () => {
