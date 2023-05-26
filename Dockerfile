@@ -59,5 +59,5 @@ COPY --from=build /myapp/start.sh /myapp/start.sh
 COPY --from=build /myapp/tsconfig.json /myapp/tsconfig.json
 COPY --from=build /myapp/prisma /myapp/prisma
 
-CMD ["/myapp/start.sh"]
-#CMD [ "npm", "run", "start" ]
+#CMD ["/myapp/start.sh"]
+CMD [ "npm", "run", "start" ]
