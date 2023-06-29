@@ -15,15 +15,13 @@ async function handleSocialAuthCallback({
 }: {
   profile: GoogleProfile;
 }) {
+  
   console.log("getting employes");
-
-  //Temporary hack, fix this
-  profile.emails[0].value = "povilas.galcius@komponent.no";
-
   const employees = await getEmployees();
   const xledgerEmployeeMatch = employees.find(
     (employee) => employee.email === profile.emails[0].value
   );
+
   console.log("checking xledger match");
   if (!xledgerEmployeeMatch) {
     throw new Error(
@@ -36,6 +34,7 @@ async function handleSocialAuthCallback({
       name: Role.employee,
     },
   });
+  
   console.log("defaultRole", defaultRole);
 
   invariant(defaultRole, "No default role found");
