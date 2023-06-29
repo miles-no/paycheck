@@ -16,6 +16,10 @@ async function handleSocialAuthCallback({
   profile: GoogleProfile;
 }) {
   console.log("getting employes");
+
+  //Temporary hack, fix this
+  profile.emails[0].value = "povilas.galcius@komponent.no";
+
   const employees = await getEmployees();
   const xledgerEmployeeMatch = employees.find(
     (employee) => employee.email === profile.emails[0].value
