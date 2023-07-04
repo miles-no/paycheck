@@ -16,15 +16,8 @@ async function handleSocialAuthCallback({
   profile: GoogleProfile;
 }) {
   
-
-  if (profile.emails[0].value === "thomas.barheim@miles.no"){
-    console.log("Email is 'thomas.barheim@miles.no transforming it to be thomas@miles.no")
-    profile.emails[0].value = "thomas@miles.no"
-  }
-
   console.log("getting employes");
   const employees = await getEmployees();
-
   const xledgerEmployeeMatch = employees.find(
     (employee) => employee.email === profile.emails[0].value
   );
