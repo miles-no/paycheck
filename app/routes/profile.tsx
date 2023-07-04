@@ -9,7 +9,7 @@ import {
   ExtraVariablesSection,
   getXledgerEmployeeData,
   RoleSection,
-  XledgerInfoSection
+  XledgerInfoSection,
 } from "~/routes/employees/$employeeId";
 import { authenticator } from "~/services/auth.server";
 import { requireUser } from "~/services/user.server";
@@ -25,16 +25,16 @@ export async function loader({ params, context, request }: LoaderArgs) {
   const xledgerData = await getXledgerEmployeeData(
     user?.employeeDetails?.xledgerId as string
   );
-  const { employee, rate: yearlyFixedSalary } =
-    xledgerData.data?.payrollRates?.edges?.[0]?.node;
-  const { code, description, email } = employee;
+  const employee = xledgerData.data?.payrollRates?.edges?.[0]?.node?.employee;
+  const yearlyFixedSalary =
+    xledgerData.data?.payrollRates?.edges?.[0]?.node?.rate;
 
   return json({
     employee: {
       xledgerId: user?.employeeDetails?.xledgerId,
-      code,
-      description,
-      email,
+      code: employee?.code,
+      description: employee?.description,
+      email: employee?.email,
       yearlyFixedSalary,
     },
     user,

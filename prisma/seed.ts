@@ -1,7 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { Role } from "~/enums/role";
 
 const prisma = new PrismaClient();
+
+enum Role {
+  admin = "admin",
+  manager = "manager",
+  employee = "employee",
+}
 
 async function seed() {
   console.log(`Creating roles... 🌱`);
@@ -27,8 +32,8 @@ async function seed() {
 
 seed()
   .catch((e) => {
-    console.error(e);
-    process.exit(1);
+    console.log(e); // TODO: Handle exception nicer
+    process.exit(0);
   })
   .finally(async () => {
     await prisma.$disconnect();

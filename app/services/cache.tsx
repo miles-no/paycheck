@@ -42,14 +42,14 @@ declare global {
 }
 
 // and handle the cache lifecycle here
-if (process.env.NODE_ENV === "production") {
+// if (process.env.NODE_ENV === "production") {
+//   global.__cache = new LRUCache(options);
+// } else {
+if (!global.__cache) {
   global.__cache = new LRUCache(options);
-} else {
-  if (!global.__cache) {
-    global.__cache = new LRUCache(options);
-  }
-
-  cache = global.__cache;
 }
+
+cache = global.__cache;
+// }
 
 export { cache };
