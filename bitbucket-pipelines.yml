@@ -69,7 +69,7 @@ pipelines:
         - export ECS_MEMORY=$DEV_ECS_MEMORY
         - ./cicd/entrypoint.sh
         - "curl -X POST \"https://api.cloudflare.com/client/v4/zones/37e096943b18f281d3bb669c42388ff9/purge_cache\" -H \"Authorization: Bearer ${CF_TOKEN}\" -H 'Content-Type:application/json' -d '{\"purge_everything\":true}'"
-    master:
+    main:
     - step:
         size: 2x
         name: Build Docker Image
