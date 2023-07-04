@@ -5,7 +5,7 @@ FROM node:18-bullseye-slim as base
 ENV NODE_ENV production
 
 # Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl=3*
+RUN apt-get update && apt-get install -y openssl
 
 # Install all node_modules, including dev dependencies
 FROM base as deps
