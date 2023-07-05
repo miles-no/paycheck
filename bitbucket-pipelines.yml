@@ -55,7 +55,7 @@ pipelines:
         - docker load --input "${IMAGE_NAME}.tar"
         - docker tag "${DEV_ECR_REPOSITORY}" "${DEV_ECR_REPOSITORY}:${BITBUCKET_COMMIT}"
         - docker tag "${DEV_ECR_REPOSITORY}" "${DEV_ECR_REPOSITORY}:latest"
-        - eval $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}" | sed 's;https://;;g')
+        - aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${DEV_ECR_REPOSITORY}"" | sed 's;https://;;g'
         - docker push "${DEV_ECR_REPOSITORY}:${BITBUCKET_COMMIT}"
         - docker push "${DEV_ECR_REPOSITORY}:latest"
         - export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
@@ -98,7 +98,7 @@ pipelines:
         - docker load --input "${IMAGE_NAME}.tar"
         - docker tag "${PROD_ECR_REPOSITORY}" "${PROD_ECR_REPOSITORY}:${BITBUCKET_COMMIT}"
         - docker tag "${PROD_ECR_REPOSITORY}" "${PROD_ECR_REPOSITORY}:latest"
-        - eval $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}" | sed 's;https://;;g')
+        - aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${PROD_ECR_REPOSITORY}"" | sed 's;https://;;g'
         - docker push "${PROD_ECR_REPOSITORY}:${BITBUCKET_COMMIT}"
         - docker push "${PROD_ECR_REPOSITORY}:latest"
         - export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
