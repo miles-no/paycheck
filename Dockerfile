@@ -5,7 +5,7 @@ FROM node:18-bullseye-slim as base
 ENV NODE_ENV production
 
 # Install openssl for Prisma
-# hadolint ignore=DL3018
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y openssl
 
 # Install all node_modules, including dev dependencies
