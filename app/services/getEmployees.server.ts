@@ -64,6 +64,7 @@ export const getEmployees = async () => {
       endCursor = json.data.employees.pageInfo.endCursor;
     } catch (error) {
       console.error(error);
+      break;
     }
   }
   const sortedEmployees = employees.sort((a, b) => {
