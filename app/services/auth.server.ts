@@ -10,16 +10,33 @@ import { Role } from "~/enums/role";
 
 export const authenticator = new Authenticator(sessionStorage);
 
+const thomasAtMiles = "thomas@miles.no";
+
+async function getRole(email: string){
+  if (email === thomasAtMiles){
+    return await prisma.role.findUnique({
+      where: {
+        name: Role.admin,
+      },
+    });
+  }
+
+  return await prisma.role.findUnique({
+    where: {
+      name: Role.employee,
+    },
+  });
+}
+
 async function handleSocialAuthCallback({
   profile,
 }: {
   profile: GoogleProfile;
 }) {
   
-
   if (profile.emails[0].value === "thomas.barheim@miles.no"){
-    console.log("Email is 'thomas.barheim@miles.no transforming it to be thomas@miles.no")
-    profile.emails[0].value = "thomas@miles.no"
+    console.log(`Email is 'thomas.barheim@miles.no transforming it to be ${thomasAtMiles}`)
+    profile.emails[0].value = thomasAtMiles;
   }
 
   console.log("getting employes");
@@ -35,6 +52,8 @@ async function handleSocialAuthCallback({
       "No Xledger employee found with email " + profile.emails[0].value
     );
   }
+
+  const roleEnum = profile.emails[0].value === thomasAtMiles ? Role.admin : Role.employee
 
   const defaultRole = await prisma.role.findUnique({
     where: {
