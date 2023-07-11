@@ -12,22 +12,6 @@ export const authenticator = new Authenticator(sessionStorage);
 
 const thomasAtMiles = "thomas@miles.no";
 
-async function getRole(email: string){
-  if (email === thomasAtMiles){
-    return await prisma.role.findUnique({
-      where: {
-        name: Role.admin,
-      },
-    });
-  }
-
-  return await prisma.role.findUnique({
-    where: {
-      name: Role.employee,
-    },
-  });
-}
-
 async function handleSocialAuthCallback({
   profile,
 }: {
@@ -52,8 +36,6 @@ async function handleSocialAuthCallback({
       "No Xledger employee found with email " + profile.emails[0].value
     );
   }
-
-  const roleEnum = profile.emails[0].value === thomasAtMiles ? Role.admin : Role.employee
 
   const defaultRole = await prisma.role.findUnique({
     where: {
