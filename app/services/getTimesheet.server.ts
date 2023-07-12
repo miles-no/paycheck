@@ -9,9 +9,10 @@ export function getMonthInterval(date: Date) {
   const month = newDate.getUTCMonth();
 
   const startOfMonth = new Date(Date.UTC(year, month, 1));
-  const endOfMonth = new Date(Date.UTC(year, month + 1, 0));
+  const endOfMonth = new Date(Date.UTC(year, month + 1, 1));
   const from = startOfMonth.toISOString().split("T")[0];
   const to = endOfMonth.toISOString().split("T")[0];
+
   return { from, to };
 }
 

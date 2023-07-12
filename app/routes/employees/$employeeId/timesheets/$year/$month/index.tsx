@@ -8,6 +8,7 @@ import { TimeSheetNav } from "~/components/timeSheetNav";
 import { getEmployeeDetailsByXledgerId } from "~/models/employeeDetails.server";
 import { getXledgerEmployeeData } from "~/routes/employees/$employeeId";
 import { cache } from "~/services/cache";
+import { getEmployees } from "~/services/getEmployees.server";
 import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
 import {
   getMonthInterval,
@@ -57,6 +58,13 @@ export async function loader({ params, context, request }: LoaderArgs) {
   const selfCostFactor = employeeDetails?.selfCostFactor;
   const provisionPercentage = employeeDetails?.provisionPercentage;
 
+  //to get employee name, we need to get it from the employees list
+  const employees = await getEmployees();
+  
+  const employee = employees.find(
+    (employee) => employee.dbId.toString() === employeeId
+  );
+
   if (selfCostFactor == null || provisionPercentage == null) {
     // We are missing some parameters, redirect to edit page
     return redirect(`/employees/${employeeId}`);
@@ -82,11 +90,11 @@ export async function loader({ params, context, request }: LoaderArgs) {
     selfCostFactor,
     provisionPercentage
   );
-
+ 
   // Select the project with the highest sum of hours
   const mainProject = getMainProject(timesheets);
 
-  return json({ timesheets, monthlyPay, totalByProject, mainProject, user });
+  return json({ timesheets, monthlyPay, totalByProject, mainProject, user, employee });
 }
 
 export const action = async ({ request, params }: ActionArgs) => {
@@ -117,7 +125,7 @@ export const action = async ({ request, params }: ActionArgs) => {
 };
 
 export default function MonthlyTimesheetPage() {
-  const { monthlyPay, totalByProject, mainProject, user } =
+  const { monthlyPay, totalByProject, mainProject, user, employee } =
     useLoaderData<typeof loader>();
 
   const { employeeId, year, month } = useParams();
@@ -142,7 +150,7 @@ export default function MonthlyTimesheetPage() {
           <div className="sm:flex sm:items-center">
             <div className="sm:flex-auto">
               <h1 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                Forventet lønnsomsetning
+                Forventet lønnsomsetning - {employee?.description}
               </h1>
               <p className="mt-2 text-sm text-gray-700 dark:text-gray-200">
                 For arbeid utført i {monthName} {year}.
