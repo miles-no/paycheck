@@ -11,6 +11,7 @@ import { Role } from "~/enums/role";
 export const authenticator = new Authenticator(sessionStorage);
 
 const thomasAtMiles = "thomas@miles.no";
+const thomasBerheimAtMiles = "thomas.barheim@miles.no"
 
 async function handleSocialAuthCallback({
   profile,
@@ -18,8 +19,8 @@ async function handleSocialAuthCallback({
   profile: GoogleProfile;
 }) {
   
-  if (profile.emails[0].value === "thomas.barheim@miles.no"){
-    console.log(`Email is 'thomas.barheim@miles.no transforming it to be ${thomasAtMiles}`)
+  if (profile.emails[0].value === thomasBerheimAtMiles){
+    console.log(`Email is ${thomasBerheimAtMiles} transforming it to be ${thomasAtMiles}`)
     profile.emails[0].value = thomasAtMiles;
   }
 
