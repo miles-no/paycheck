@@ -81,7 +81,7 @@ export async function loader({ params, context, request }: LoaderArgs) {
     employeeId as string
   );
   const yearlyFixedSalary =
-    xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.rate || 600000;
+    xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.rate || 12;
 
   // Calculate monthly pay
   const monthlyPay = calculateMonthlyPayFromSubTotal(
