@@ -90,8 +90,21 @@ export async function loader({ request }: LoaderArgs) {
       provisionPercentage || 0
     );
 
-    employeRows.push(
-      [employee.code, employee.description, monthlyPay.fixedSalary, monthlyPay.provision]
+    Intl.NumberFormat
+
+    employeRows.push([
+      employee.code, 
+      employee.description, 
+      Intl.NumberFormat("nb-NO", {
+        style: "currency",
+        currency: "NOK",
+        maximumFractionDigits: 2,
+      }).format(monthlyPay.fixedSalary),
+      Intl.NumberFormat("nb-NO", {
+        style: "currency",
+        currency: "NOK",
+        maximumFractionDigits: 2,
+      }).format(monthlyPay.provision)]
     )
 
     break;
