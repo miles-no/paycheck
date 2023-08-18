@@ -34,7 +34,7 @@ export default function IndexPage() {
               Ansatte ({employees.length})
             </h1>
             <p className={"mt-2 text-sm text-gray-700 dark:text-gray-300"}>
-              Velg en ansatt for å se timelister
+             Last ned forrige måneds <a href="/report" target="_blank" rel="noopener noreferrer">rapporter</a>
             </p>
           </div>
         </div>
