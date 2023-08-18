@@ -106,8 +106,6 @@ export async function loader({ request }: LoaderArgs) {
         maximumFractionDigits: 2,
       }).format(monthlyPay.provision)]
     )
-
-    break;
   }
 
   ws.addRows([
