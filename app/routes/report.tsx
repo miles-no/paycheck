@@ -3,7 +3,6 @@ import Excel from "exceljs";
 import { Response } from "@remix-run/node";
 import { Transform } from "node:stream";
 import { getEmployees } from "~/services/getEmployees.server";
-import { isAdminOrManager } from "~/utils/isAdminOrManager";
 import { requireUser } from "~/services/user.server";
 import { getTimesheets } from "~/services/getTimesheet.server";
 import { aggregateProjectSummary } from "~/utils/aggregateProjectSummary.server";
@@ -36,7 +35,7 @@ function getMonthName(date: Date){
 }
 
 export async function loader({ request }: LoaderArgs) {
-  // Check if user is allowed to trigger this action
+  // Check if the user is allowed to trigger this action
   const user = await requireUser(request);
 
   if (!user) return new Response("Unauthorized", { status: 401 });
@@ -55,7 +54,7 @@ export async function loader({ request }: LoaderArgs) {
     return a.code > b.code ? 1 : a.code < b.code ? -1 : 0;
   })
 
-  const employeRows = [];
+  const employeeRows = [];
 
   for(let i = 0; i < employees.length; i++){
     const employee = employees[i];
@@ -90,9 +89,7 @@ export async function loader({ request }: LoaderArgs) {
       provisionPercentage || 0
     );
 
-    Intl.NumberFormat
-
-    employeRows.push([
+    employeeRows.push([
       employee.code, 
       employee.description, 
       Intl.NumberFormat("nb-NO", {
@@ -142,7 +139,7 @@ export async function loader({ request }: LoaderArgs) {
       {name: 'Provisjon', totalsRowLabel: 'Total', totalsRowFunction: 'sum', filterButton: true},
     ],
     rows: [
-      ...employeRows
+      ...employeeRows
     ],
   });
 
@@ -154,7 +151,7 @@ export async function loader({ request }: LoaderArgs) {
     },
   });
   
-  //Write the excel to it
+  //Write the Excel file to stream
   await wb.xlsx.write(stream)
 
   return new Response(stream,
