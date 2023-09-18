@@ -52,41 +52,42 @@ async function handleSocialAuthCallback({
 
   console.log("setting up user in database");
   const res = await prisma.user.upsert({
-    where: {
+    where: { // Find the user by googleId
       googleId: profile.id,
     },
-    update: {
+    create: { // Create the user if it doesn't exist
       googleId: profile.id,
       name: profile.displayName,
       email: profile.emails[0].value,
       picture: profile.photos[0].value,
-      employeeDetails: {
-        connectOrCreate: {
-          where: {
-            xledgerId: `${xledgerEmployeeMatch.dbId}`,
-          },
-          create: {
-            xledgerId: `${xledgerEmployeeMatch.dbId}`,
-          },
-        },
-      },
-    },
-    create: {
-      googleId: profile.id,
-      name: profile.displayName,
-      email: profile.emails[0].value,
-      picture: profile.photos[0].value,
-      role: {
+      role: { // Connect the user to the default role
         connect: {
           id: defaultRole.id,
         },
       },
       employeeDetails: {
-        create: {
+        create: { // Create employeeDetails
           xledgerId: `${xledgerEmployeeMatch.dbId}`,
         },
       },
     },
+    update: { // Update the user if it already exists
+      name: profile.displayName,
+      email: profile.emails[0].value,
+      picture: profile.photos[0].value,
+      employeeDetails: { // Upsert employeeDetails
+        connectOrCreate: { // Connect if it exists, otherwise create it
+          where: { // Find employeeDetails by xledgerId
+            xledgerId: `${xledgerEmployeeMatch.dbId}`,
+          },
+          create: { // Create employeeDetails if it doesn't exist
+            xledgerId: `${xledgerEmployeeMatch.dbId}`,
+          },
+        },
+      },
+    },
+  }).catch((err) => {
+    console.log("Error creating user", err);
   });
   console.log({ res });
   return profile;
