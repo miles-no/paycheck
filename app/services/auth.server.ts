@@ -19,6 +19,8 @@ async function handleSocialAuthCallback({
   profile: GoogleProfile;
 }) {
   
+  console.log(`Email logging in ${profile.emails[0].value}, google id: ${profile.id}`)
+
   if (profile.emails[0].value === thomasBerheimAtMiles){
     console.log(`Email is ${thomasBerheimAtMiles} transforming it to be ${thomasAtMiles}`)
     profile.emails[0].value = thomasAtMiles;
