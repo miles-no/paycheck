@@ -5,7 +5,7 @@ export function generateXledgerTimesheetTestData(
   month: number
 ): XLedgerGraphQLTimesheetQueryResponse {
   const daysInMonth = new Date(year, month, 0).getDate();
-  const edges = [];
+  const edges: XLedgerGraphQLTimesheetQueryResponse["data"]["timesheets"]["edges"] = [];
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month - 1, day);
@@ -18,10 +18,14 @@ export function generateXledgerTimesheetTestData(
             .toString()
             .padStart(2, "0")}`,
           workingHours: "7.5000",
+          invoiceHours: "7.5000",
           hourlyRevenueCurrency: "1200.0000",
           projectDbId: 28260176,
           project: {
             description: "Example Project",
+            projectGroup: {
+              code: "000",
+            }
           },
           activity: {
             code: "Example Activity",

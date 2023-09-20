@@ -6,7 +6,8 @@ import {
   ClockIcon,
   HomeIcon,
   UserCircleIcon,
-  UsersIcon
+  UsersIcon,
+  DocumentIcon
 } from "@heroicons/react/24/outline";
 import { Fragment, useEffect, useState } from "react";
 import type { Command } from "~/root";
@@ -55,6 +56,13 @@ function getIcon(icon: string) {
     case "clock":
       return (
         <ClockIcon
+          className="h-5 w-5 text-gray-400 dark:text-white"
+          aria-hidden="true"
+        />
+      );
+    case "document-report":
+      return (
+        <DocumentIcon
           className="h-5 w-5 text-gray-400 dark:text-white"
           aria-hidden="true"
         />

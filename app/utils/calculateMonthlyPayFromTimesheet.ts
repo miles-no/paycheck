@@ -1,4 +1,4 @@
-import { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
+import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
 
 /**
  * Calculates the pay for a given timesheet.
@@ -8,7 +8,7 @@ import { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.se
  *
  * @param timesheets - The timesheet to calculate the pay for.
  * @param yearlyFixedSalary - The yearly fixed salary.
- * @param selfCostFactor - The self cost factor.
+ * @param selfCostFactor - The self-cost factor.
  * @param provisionPercentage - The provision percentage.
  * @returns monthlyPay - The monthly pay for the given timesheet.
  */
@@ -32,7 +32,7 @@ export function calculateMonthlyPayFromTimesheet(
  * For example, if you want to include hours that are not invoiced, you can add those to the sub-total.
  * @param subTotal - The sub-total to calculate the pay for.
  * @param yearlyFixedSalary - The yearly fixed salary.
- * @param selfCostFactor -  The self cost factor.
+ * @param selfCostFactor - The self-cost factor.
  * @param provisionPercentage - The provision percentage.
  * @returns monthlyPay - The monthly pay for the given sub-total.
  */
@@ -47,7 +47,7 @@ export function calculateMonthlyPayFromSubTotal(
 
   // Monthly Provision
   const selfCost = getMonthlySelfCost(fixedSalary, selfCostFactor);
-  const netAmountInvoiced = getNetAmountInvoiced(subTotal, selfCost);
+  const netAmountInvoiced = getExcessNetAmount(subTotal, selfCost);
   const provision = getMonthlyProvision(netAmountInvoiced, provisionPercentage);
 
   // Monthly Pay
@@ -57,7 +57,7 @@ export function calculateMonthlyPayFromSubTotal(
     invoicedAmount: subTotal,
     netAmountInvoiced,
     provision,
-    pay: fixedSalary + provision,
+    pay: fixedSalary + provision
   };
 }
 
@@ -79,6 +79,23 @@ export function getInvoicedAmount(
 ) {
   return (
     timesheets.data.timesheets.edges?.reduce((acc, edge) => {
+      const { hourlyRevenueCurrency, invoiceHours } = edge.node;
+      const hours = parseFloat(invoiceHours);
+      const hourlyRevenue = parseFloat(hourlyRevenueCurrency);
+      const invoicedAmount = hours * hourlyRevenue;
+      return acc + invoicedAmount;
+    }, 0) || 0
+  );
+}
+
+/**
+ * Get the total amount that you should be paid
+ */
+export function getPayedAmount(
+  timesheets: XLedgerGraphQLTimesheetQueryResponse
+) {
+  return (
+    timesheets.data.timesheets.edges?.reduce((acc, edge) => {
       const { hourlyRevenueCurrency, workingHours } = edge.node;
       const hours = parseFloat(workingHours);
       const hourlyRevenue = parseFloat(hourlyRevenueCurrency);
@@ -89,10 +106,10 @@ export function getInvoicedAmount(
 }
 
 /**
- * Get the net amount invoiced. (aka. Netto utfakturert beløp som overstiger selvkost)
+ * Get the excess net amount. (aka. Netto utfakturert beløp som overstiger selvkost)
  * This is the amount that is left after subtracting the monthly self-cost from the total amount invoiced.
  */
-export function getNetAmountInvoiced(
+export function getExcessNetAmount(
   invoicedAmount: number,
   monthlySelfCost: number
 ) {

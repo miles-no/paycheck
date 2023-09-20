@@ -27,31 +27,38 @@ export function aggregateProjectSummary(
   const mainProjectRate = Number(
     getMainProjectTimeEntries(timesheetQueryResponse)?.[0].hourlyRevenueCurrency
   );
+  const mainProjectName = getMainProjectTimeEntries(timesheetQueryResponse)?.[0].project.description;
+  console.log("mainProjectRate", mainProjectRate,mainProjectName);
 
   const byProject = groupByProject(timesheetQueryResponse);
   // Map over grouped timesheetQueryResponse and calculate rate and sum for each project
   return Object.entries(byProject)
     .map(([projectName, timeEntries]) => {
       // Calculate rate and explanation based on activity code
-      const { rate, explanation } = calculateRateAndExplanation(
+      const { rate, explanation, error } = calculateRateAndExplanation(
         timeEntries,
         mainProjectRate
       );
 
       // Calculate total hours worked on a project
       const hoursWorked = calculateHoursWorked(timeEntries);
+      const hoursInvoiced = calculateHoursInvoiced(timeEntries);
 
-      // Calculate total sum earned for project
+      // The sum that should be invoiced for a project
+      const sumInvoiced = hoursInvoiced * rate;
+
+      // The sum that should be count as earned for a project by the employee
       const sumEarned = hoursWorked * rate;
 
       // Return an object with project information
       return {
         id: timeEntries[0].projectDbId,
         name: projectName,
-        hours: hoursWorked,
+        hours: { worked: hoursWorked, invoiced: hoursInvoiced },
         rate,
-        sum: sumEarned,
+        sum: { earned: sumEarned, invoiced: sumInvoiced},
         explanation,
+        error,
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -69,9 +76,10 @@ function calculateRateAndExplanation(
 ) {
   const activityCode = timeEntries?.[0]?.activity?.code || "UNKNOWN";
 
-  // Most projects have a rate from xlledger. So we default to that.
+  // Most projects have a rate from Xledger. So we default to that.
   let rate = Number(timeEntries[0].hourlyRevenueCurrency); // NB: Assuming the same rate for all time entries
-  let explanation;
+  let explanation = "";
+  let error = "";
 
   // Some projects have a special rate. So we override the rate and explanation.
   // Set rate and explanation based on activity code
@@ -103,7 +111,30 @@ function calculateRateAndExplanation(
     explanation = "100% av hovedprosjekt";
   }
 
-  return { rate, explanation };
+  // If projectName is PayCheck, then use the main project rate
+  // if (timeEntries[0].project?.description === "Paycheck") {
+  //   // Todo: only do this for Henry
+  //   console.log("Using main project rate for Paycheck",mainProjectRate);
+  //   rate = 1370;
+  //   explanation = "100% av hovedprosjekt";
+  //
+  //   timeEntries.forEach((node) => {
+  //     node.invoiceHours = node.workingHours;
+  //   });
+  // }
+
+  // Check if the invoice hours is the same as the working hours
+  timeEntries.forEach((node) => {
+    const { invoiceHours, workingHours, project } = node;
+    const { projectGroup } = project;
+    if (projectGroup?.code === "201" || projectGroup?.code === "201-Haug ") {
+      if (workingHours !== invoiceHours) {
+        error = "Fakturerte timer er ikke lik arbeidstimer. Usikker på hva det betyr? Spør Siri.";
+      }
+    }
+  });
+
+  return { rate, explanation, error };
 }
 
 /**
@@ -121,7 +152,23 @@ function calculateHoursWorked(
 }
 
 /**
- * Returns the project with the most working hours
+ * Returns the total hours invoiced on a project
+ * @param timeEntries
+ */
+function calculateHoursInvoiced(
+  timeEntries: XLedgerGraphQLTimesheetQueryResponse["data"]["timesheets"]["edges"][0]["node"][]
+) {
+  if (!timeEntries) return 0;
+
+  // Calculate total hours worked on a project
+  return timeEntries.reduce((totalHours, node) => {
+    return totalHours + parseFloat(node.invoiceHours);
+  }, 0);
+}
+
+
+/**
+ * Returns the project with the most invoiced hours (TODO: check if this is correct)
  * @param queryResponse
  */
 function getMainProjectTimeEntries(
@@ -131,30 +178,17 @@ function getMainProjectTimeEntries(
 
   // Find the project with the most working hours
   let mainProjectKey = "";
-  let maxWorkingHours = 0;
+  let maxInvoicedHours = 0;
 
   Object.entries(grouped).forEach(([key, projectTimesheet]) => {
-    const workHours = getTotalWorkingHoursForProject(projectTimesheet);
-    if (workHours > maxWorkingHours) {
-      maxWorkingHours = workHours;
+    const invoicedHours = calculateHoursInvoiced(projectTimesheet);
+    if (invoicedHours > maxInvoicedHours) {
+      maxInvoicedHours = invoicedHours;
       mainProjectKey = key;
     }
   });
 
   return grouped[mainProjectKey];
-}
-
-/**
- * Returns the total working hours for a project
- * @param projectData
- */
-function getTotalWorkingHoursForProject(
-  projectData: XLedgerGraphQLTimesheetQueryResponse["data"]["timesheets"]["edges"][0]["node"][]
-) {
-  if (!projectData) return 0;
-  return projectData.reduce((acc, { workingHours }) => {
-    return acc + parseFloat(workingHours);
-  }, 0);
 }
 
 type GroupedByProject = {

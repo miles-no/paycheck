@@ -2,7 +2,7 @@ import type { EmployeeDetails, Role, User } from ".prisma/client";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import type { LoaderArgs, ActionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useLoaderData, useParams } from "@remix-run/react";
+import { Form, isRouteErrorResponse, useLoaderData, useParams, useRouteError } from "@remix-run/react";
 import Navbar from "~/components/navbar";
 import { TimeSheetNav } from "~/components/timeSheetNav";
 import { getEmployeeDetailsByXledgerId } from "~/models/employeeDetails.server";
@@ -13,10 +13,11 @@ import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimeshe
 import {
   getMonthInterval,
   getTimesheetCacheKey,
-  getTimesheets,
+  getTimesheets
 } from "~/services/getTimesheet.server";
 import { requireUser } from "~/services/user.server";
 import { aggregateProjectSummary } from "~/utils/aggregateProjectSummary.server";
+import type { ErrorResponse } from "@remix-run/router";
 import { calculateMonthlyPayFromSubTotal } from "~/utils/calculateMonthlyPayFromTimesheet";
 
 function getMainProject(
@@ -25,14 +26,14 @@ function getMainProject(
   const totalByProject = aggregateProjectSummary(timesheetQueryResponse);
   let mainProject;
   for (const project in totalByProject) {
-    if (!mainProject || totalByProject[project].hours > mainProject.hours) {
+    if (!mainProject || totalByProject[project].hours.invoiced > mainProject.hours.invoiced) {
       mainProject = totalByProject[project];
     }
   }
   return mainProject;
 }
 
-export async function loader({ params, context, request }: LoaderArgs) {
+export async function loader({ params, request }: LoaderArgs) {
   const { employeeId, year, month } = params;
 
   const user = await requireUser(request);
@@ -40,7 +41,7 @@ export async function loader({ params, context, request }: LoaderArgs) {
   if (user.role.name === ("admin" || "manager")) {
     // good to go
   } else {
-    // Check if user is allowed to view this page
+    // Check if the user is allowed to view this page
     if (user.employeeDetails && user.employeeDetails.xledgerId !== employeeId)
       return redirect("/403");
   }
@@ -73,7 +74,7 @@ export async function loader({ params, context, request }: LoaderArgs) {
   // Calculate total hours and revenue by project
   const totalByProject = aggregateProjectSummary(timesheets);
   const subTotal = Object.values(totalByProject || {}).reduce(
-    (acc, cur) => acc + cur.sum,
+    (acc, cur) => acc + cur.sum.earned,
     0
   );
 
@@ -81,7 +82,7 @@ export async function loader({ params, context, request }: LoaderArgs) {
     employeeId as string
   );
   const yearlyFixedSalary =
-    xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.rate || 12;
+    xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.rate || 0;
 
   // Calculate monthly pay
   const monthlyPay = calculateMonthlyPayFromSubTotal(
@@ -90,7 +91,7 @@ export async function loader({ params, context, request }: LoaderArgs) {
     selfCostFactor,
     provisionPercentage
   );
- 
+
   // Select the project with the highest sum of hours
   const mainProject = getMainProject(timesheets);
 
@@ -202,8 +203,9 @@ export default function MonthlyTimesheetPage() {
               <tbody>
                 {totalByProject.length > 0 ? (
                   Object.values(totalByProject).map(
-                    ({ hours, name, rate, sum, explanation }) => (
-                      <tr key={name} className={"border-b border-gray-300"}>
+                    ({ hours, name, rate, sum, explanation, error }) => (
+                      <tr key={name}
+                          className={`border-b border-gray-300 ${error ? "bg-red-300 dark:bg-red-950 rounded" : ""}`}>
                         <td className={"py-4 pl-4 pr-3 text-sm sm:pl-0"}>
                           <p
                             className={
@@ -212,42 +214,46 @@ export default function MonthlyTimesheetPage() {
                           >
                             {name}
                           </p>
-                          <p className={"mt-0.5 text-gray-500 md:hidden"}>
+                          <p
+                            className={`mt-0.5 md:hidden text-gray-500 ${error ? "dark:text-white text-black italic pt-2 pb-2" : ""}`}>
                             {mainProject?.name === name
                               ? "Hovedprosjekt"
                               : explanation
-                              ? `${explanation}`
-                              : ""}
+                                ? `${explanation}`
+                                : ""}
+                            {error ? ` - OBS! ${error}` : ""}
                           </p>
                           <p className={"mt-0.5 text-gray-500 md:hidden"}>
                             {Intl.NumberFormat("nb-NO", {
                               style: "decimal",
-                              maximumFractionDigits: 2,
-                            }).format(hours)}{" "}
+                              maximumFractionDigits: 2
+                            }).format(hours.worked)}{" "}
                             *{" "}
                             {Intl.NumberFormat("nb-NO", {
                               style: "currency",
                               currency: "NOK",
-                              maximumFractionDigits: 2,
+                              maximumFractionDigits: 2
                             }).format(rate)}
+                            <br />
                           </p>
                         </td>
                         <td
                           className={
-                            "hidden py-4 px-3 text-sm text-gray-500 md:table-cell"
+                            `hidden py-4 px-3 text-sm text-gray-500 md:table-cell ${error ? "dark:text-white text-black italic pt-2 pb-2" : ""} `
                           }
                         >
                           {mainProject?.name === name
                             ? "Hovedprosjekt"
                             : explanation
-                            ? `${explanation}`
-                            : ""}
+                              ? `${explanation}`
+                              : ""}
+                          {error ? ` - OBS! ${error}` : ""}
                         </td>
                         <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell">
                           {Intl.NumberFormat("nb-NO", {
                             style: "decimal",
-                            maximumFractionDigits: 2,
-                          }).format(hours)}
+                            maximumFractionDigits: 2
+                          }).format(hours.worked)}
                         </td>
                         <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell">
                           {Intl.NumberFormat("nb-NO", {
@@ -261,7 +267,7 @@ export default function MonthlyTimesheetPage() {
                             style: "currency",
                             currency: "NOK",
                             maximumFractionDigits: 2,
-                          }).format(sum)}
+                          }).format(sum.earned)}
                         </td>
                       </tr>
                     )
@@ -434,24 +440,24 @@ export default function MonthlyTimesheetPage() {
   );
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
+function StandardErrorBoundary({ error }: { error: ErrorResponse }) {
   return (
     <div className={"pt-10 text-center"}>
       <h1 className={"text-2xl font-semibold "}>Oops, something went wrong</h1>
-      <p className={"text-red-500"}>{error.message}</p>
+      <p className={"text-red-500"}>{error.data.message}</p>
       <div className={"overflow-auto"}>
         <pre
           className={
             "m-4 inline-block rounded bg-gray-100 p-2 text-left text-sm dark:bg-gray-900"
           }
         >
-          <code>{error.stack}</code>
+          <code>{error.data.stack}</code>
         </pre>
         <button
           className={"ml-2 rounded bg-gray-100 p-2 text-sm dark:bg-gray-900"}
           onClick={() => {
             navigator.clipboard.writeText(
-              JSON.stringify({ ...error, stack: error.stack }, null, 2)
+              JSON.stringify({ ...error, stack: error.data.stack }, null, 2)
             );
           }}
         >
@@ -459,7 +465,7 @@ export function ErrorBoundary({ error }: { error: Error }) {
         </button>
         <a
           href={`mailto:henry.sjoen@miles.no?subject=Error in timesheet&body=${encodeURIComponent(
-            JSON.stringify({ ...error, stack: error.stack }, null, 2)
+            JSON.stringify({ ...error, stack: error.data.stack }, null, 2)
           )}`}
           className={
             "ml-2 rounded bg-gray-100 p-2 text-sm dark:bg-gray-200 dark:text-gray-900"
@@ -470,4 +476,14 @@ export function ErrorBoundary({ error }: { error: Error }) {
       </div>
     </div>
   );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return <StandardErrorBoundary error={error} />;
+  }
+
+  return <p>Something went wrong: {JSON.stringify(error)}</p>;
 }

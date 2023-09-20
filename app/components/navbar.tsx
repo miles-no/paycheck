@@ -10,28 +10,13 @@ const userNavigation = [
   { name: "Logg ut", href: "/logout" },
 ];
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export default function Navbar(props: {
   user?: User & { role: Role; employeeDetails: EmployeeDetails | null };
 }) {
   const location = useLocation();
+  const isAdmin = props.user?.role?.name === RoleEnum.admin;
 
-  let navigation: { name: string; href: string }[] = [];
-
-  if (props.user?.role?.name === RoleEnum.admin) {
-    navigation = [
-      ...navigation,
-      { name: "Oversikt", href: "/overview" },
-      { name: "Ansatte", href: "/employees" },
-      { name: "Brukere", href: "/users" },
-    ];
-  }
-  navigation = [
-    ...navigation,
-    { name: "Min profil", href: "/profile" },
+  const navigation = [
     {
       name: "Min timeliste",
       href: `/employees/${
@@ -39,6 +24,13 @@ export default function Navbar(props: {
       }/timesheets/${new Date().getFullYear()}/${new Date().getMonth() + 1}`,
       //   Todo: make the link highlight work for sub-pages as well
     },
+    ...(isAdmin
+      ? [
+        { name: "Oversikt", href: "/overview" },
+        { name: "Ansatte", href: "/employees" },
+        { name: "Brukere", href: "/users" },
+      ]
+      : []),
   ];
 
   return (
@@ -98,10 +90,9 @@ export default function Navbar(props: {
                           {({ active }) => (
                             <a
                               href={item.href}
-                              className={classNames(
-                                active ? "bg-gray-100" : "",
-                                "block py-2 px-4 text-sm text-gray-700"
-                              )}
+                              className={`${
+                                active ? "bg-gray-100" : ""
+                              } block py-2 px-4 text-sm text-gray-700`}
                             >
                               {item.name}
                             </a>
@@ -121,12 +112,11 @@ export default function Navbar(props: {
                 <a
                   key={item.name}
                   href={item.href}
-                  className={classNames(
+                  className={`${
                     location.pathname === item.href
                       ? "border-b border-black bg-opacity-50 font-bold text-gray-900 dark:border-gray-700 dark:text-gray-300"
-                      : "border-b border-transparent text-gray-500 hover:border-gray-300 dark:hover:border-gray-700 dark:hover:text-gray-300",
-                    "inline-flex items-center py-2 px-3 text-sm font-medium"
-                  )}
+                      : "border-b border-transparent text-gray-500 hover:border-gray-300 dark:hover:border-gray-700 dark:hover:text-gray-300"
+                  } inline-flex items-center py-2 px-3 text-sm font-medium`}
                   aria-current={
                     location.pathname === item.href ? "page" : undefined
                   }
@@ -144,12 +134,11 @@ export default function Navbar(props: {
                   key={item.name}
                   as="a"
                   href={item.href}
-                  className={classNames(
+                  className={`${
                     location.pathname === item.href
                       ? "bg-gray-900 text-white"
-                      : "text-gray-500",
-                    "block rounded-md py-2 px-3 text-base font-medium"
-                  )}
+                      : "text-gray-500"
+                  } block rounded-md py-2 px-3 text-base font-medium`}
                   aria-current={
                     location.pathname === item.href ? "page" : undefined
                   }
@@ -177,7 +166,7 @@ export default function Navbar(props: {
                 </div>
               </div>
               <div className="mt-3 space-y-1 px-2">
-                {userNavigation.map((item) => (
+                {[{ name: "Logg ut", href: "/logout" }].map((item) => (
                   <Disclosure.Button
                     key={item.name}
                     as="a"

@@ -65,6 +65,7 @@
     "exceljs": "^4.3.0",
     "happy-dom": "^10.10.4",
     "isbot": "^3.6.13",
+    "jest-mock": "^29.6.3",
     "lru-cache": "^10.0.1",
     "module-alias": "^2.2.3",
     "msw": "^1.2.3",

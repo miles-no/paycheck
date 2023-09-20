@@ -63,7 +63,7 @@ export default function Index() {
       window.onpointermove = null; // cleanup
       clearInterval(intervalId);
     };
-  }, [blobRef.current]);
+  }, []);
 
   return (
     <>

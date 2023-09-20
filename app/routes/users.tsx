@@ -131,6 +131,7 @@ export default function UsersPage() {
                               className="h-10 w-10 rounded-full"
                               src={person.picture}
                               alt=""
+                              loading="lazy"
                             />
                           </div>
                           <div className="ml-4">

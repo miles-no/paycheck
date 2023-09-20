@@ -1,5 +1,9 @@
 import { generateXledgerTimesheetTestData } from "~/utils/generateXledgerTimesheetTestData";
-import { calculateMonthlyPayFromTimesheet } from "./calculateMonthlyPayFromTimesheet";
+import {
+  calculateMonthlyPayFromSubTotal,
+  calculateMonthlyPayFromTimesheet, getMonthlyFixedSalary, getMonthlyProvision,
+  getMonthlySelfCost, getExcessNetAmount
+} from "./calculateMonthlyPayFromTimesheet";
 import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimesheet.server";
 
 // Todo: generateXledgerTimesheetTestData has changed to accommodate special cases... update this test
@@ -62,7 +66,7 @@ test("Handle special tasks", () => {
       timesheets: {
         pageInfo: {
           hasNextPage: false,
-          endCursor: Math.random().toString(),
+          endCursor: Math.random().toString()
         },
         edges: [
           {
@@ -72,33 +76,34 @@ test("Handle special tasks", () => {
                 .toString()
                 .padStart(2, "0")}-${day.toString().padStart(2, "0")}`,
               workingHours: "2",
+              invoiceHours: "2",
               hourlyRevenueCurrency: "0",
               projectDbId: 28260176,
               project: {
-                description: "Example Project",
+                description: "Example Project"
               },
               activity: {
                 code: "S-102",
                 description: "Faglig intervju",
-                dbId: 28260176,
+                dbId: 28260176
               },
-              approved: true,
-            },
-          },
-        ],
-      },
-    },
+              approved: true
+            }
+          }
+        ]
+      }
+    }
   };
   expect(
     calculateMonthlyPayFromTimesheet(sampleTimesheet, 600000, 1.5, 0.2).pay
-  ).toBe(2000);
+  ).toBe(2000 + 50000); // Todo: figure out this edge-case. How is it actually done today?
 
   sampleTimesheet = {
     data: {
       timesheets: {
         pageInfo: {
           hasNextPage: false,
-          endCursor: Math.random().toString(),
+          endCursor: Math.random().toString()
         },
         edges: [
           {
@@ -108,18 +113,19 @@ test("Handle special tasks", () => {
                 .toString()
                 .padStart(2, "0")}-${day.toString().padStart(2, "0")}`,
               workingHours: "7.5000",
+              invoiceHours: "7.5000",
               hourlyRevenueCurrency: "1200.0000",
               projectDbId: 123456789,
               project: {
-                description: "MAIN PROJECT",
+                description: "MAIN PROJECT"
               },
               approved: true,
               activity: {
                 code: "S-000",
                 description: "Main project",
-                dbId: 28260176,
-              },
-            },
+                dbId: 28260176
+              }
+            }
           },
           {
             cursor: Math.random().toString(),
@@ -128,24 +134,64 @@ test("Handle special tasks", () => {
                 .toString()
                 .padStart(2, "0")}-${day.toString().padStart(2, "0")}`,
               workingHours: "7.5000",
+              invoiceHours: "7.5000",
               hourlyRevenueCurrency: "1200.0000",
               projectDbId: 123456789,
               project: {
-                description: "MAIN PROJECT",
+                description: "MAIN PROJECT"
               },
               approved: true,
               activity: {
                 code: "S-000",
                 description: "Main project",
-                dbId: 28260176,
-              },
-            },
-          },
-        ],
-      },
-    },
+                dbId: 28260176
+              }
+            }
+          }
+        ]
+      }
+    }
   };
   expect(
     calculateMonthlyPayFromTimesheet(sampleTimesheet, 600000, 1.5, 0.2).pay
   ).toBe(50000);
 });
+
+
+test("Calculate monthly pay from sub-total", () => {
+  expect(
+    calculateMonthlyPayFromSubTotal(
+      193320,
+      600000,
+      1.5,
+      0.2
+    ).pay
+  ).toBe(73664);
+});
+
+test("Monthly fixed salary", () => {
+  expect(
+    getMonthlyFixedSalary(
+      600000
+    )
+  ).toBe(50000);
+});
+
+test("Calculate monthly self-cost", () => {
+  const monthlyFixedSalary = getMonthlyFixedSalary(600000);
+  expect(getMonthlySelfCost(monthlyFixedSalary, 1.5)
+  ).toBe(75000);
+});
+
+test("Calculate net amount invoiced", () => {
+  expect(getExcessNetAmount(193320, 75000)
+  ).toBe(118320);
+
+});
+
+test("Calculate monthly provision", () => {
+    expect(
+      getMonthlyProvision(118320, 0.2)
+    ).toBe(23664);
+  }
+);

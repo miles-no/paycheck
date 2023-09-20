@@ -73,7 +73,7 @@ export async function loader({ request }: LoaderArgs) {
     // Calculate total hours and revenue by project
     const totalByProject = aggregateProjectSummary(timesheets);
     const subTotal = Object.values(totalByProject || {}).reduce(
-      (acc, cur) => acc + cur.sum,
+      (acc, cur) => acc + cur.sum.earned,
       0
     );
 

@@ -50,6 +50,7 @@ export const pages: Command[] = [
 export const adminPages: Command[] = [
   { id: "overview", name: "Oversikt", url: "/overview", icon: "chart-bar" },
   { id: "employees", name: "Ansatte", url: "/employees", icon: "users" },
+  {id:"report", name:"Last ned rapport av forrige måned", url:"/report", icon:"document-report" }
 ];
 export async function loader({ request }: LoaderArgs) {
   // get the meta key from the request headers

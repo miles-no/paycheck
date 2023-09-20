@@ -12,7 +12,7 @@ import {
   Link,
   useActionData,
   useLoaderData,
-  useTransition,
+  useNavigation,
 } from "@remix-run/react";
 import { Fragment, useEffect, useState } from "react";
 import Navbar from "~/components/navbar";
@@ -178,7 +178,7 @@ export default function EmployeeEditPage() {
   const actionData = useActionData();
   const hasSucceeded = !!actionData?.success;
   const hasFailed = !!actionData?.error;
-  const isSubmitting = useTransition().state === "submitting";
+  const isSubmitting = useNavigation().state === "submitting";
   const [show, setShow] = useState(hasSucceeded || hasFailed);
 
   useEffect(() => {

@@ -51,10 +51,14 @@ export const getTimesheets = async (employeeDbId: string, date: Date) => {
                   node {
                     assignmentDate
                     workingHours
+                    invoiceHours
                     hourlyRevenueCurrency
                     projectDbId
                     project{
                       description
+                      projectGroup {
+                       code
+                      }
                     }
                     activity {
                       code
@@ -153,6 +157,7 @@ export interface Node {
   };
   assignmentDate: string;
   workingHours: string;
+  invoiceHours: string;
   hourlyRevenueCurrency: string;
   projectDbId: number;
   text?: string;
@@ -162,4 +167,7 @@ export interface Node {
 
 export interface Project {
   description: string;
+  projectGroup?: {
+    code: string;
+  }
 }

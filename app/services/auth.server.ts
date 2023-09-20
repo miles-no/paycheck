@@ -18,7 +18,7 @@ async function handleSocialAuthCallback({
 }: {
   profile: GoogleProfile;
 }) {
-  
+
   console.log(`Email logging in ${profile.emails[0].value}, google id: ${profile.id}`)
 
   if (profile.emails[0].value === thomasBerheimAtMiles){
@@ -45,50 +45,54 @@ async function handleSocialAuthCallback({
       name: Role.employee,
     },
   });
-  
-  console.log("defaultRole", defaultRole);
-
   invariant(defaultRole, "No default role found");
 
-  console.log("setting up user in database");
-  const res = await prisma.user.upsert({
+  console.log("Checking if user exists...");
+  // First, try to find the user by googleId
+  const existingUser = await prisma.user.findUnique({
     where: {
       googleId: profile.id,
     },
-    update: {
-      googleId: profile.id,
-      name: profile.displayName,
-      email: profile.emails[0].value,
-      picture: profile.photos[0].value,
-      employeeDetails: {
-        connectOrCreate: {
-          where: {
-            xledgerId: `${xledgerEmployeeMatch.dbId}`,
-          },
-          create: {
-            xledgerId: `${xledgerEmployeeMatch.dbId}`,
-          },
-        },
-      },
-    },
-    create: {
-      googleId: profile.id,
-      name: profile.displayName,
-      email: profile.emails[0].value,
-      picture: profile.photos[0].value,
-      role: {
-        connect: {
-          id: defaultRole.id,
-        },
-      },
-      employeeDetails: {
-        create: {
-          xledgerId: `${xledgerEmployeeMatch.dbId}`,
-        },
-      },
-    },
   });
-  console.log({ res });
+
+  if (existingUser) {
+    console.log("User found. Updating user info like name, email, picture...");
+    // User already exists, update the user
+    const updatedUser = await prisma.user.update({
+      where: {
+        googleId: profile.id
+      },
+      data: {
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        picture: profile.photos[0].value
+      },
+    }).catch((err) => console.log("Error while updating user", err));
+    console.log("User updated", updatedUser);
+  } else {
+    console.log("User not found. Creating new user...");
+    // User doesn't exist, create a new user
+    const newUser = await prisma.user.create({
+      data: {
+        googleId: profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        picture: profile.photos[0].value,
+        role: {
+          connect: {
+            id: defaultRole.id
+          }
+        },
+        employeeDetails: {
+          create: {
+            xledgerId: xledgerEmployeeMatch.dbId.toString(),
+            selfCostFactor: 1.5
+          }
+        }
+      },
+    }).catch((err) => console.log("Error while creating user", err));
+    console.log("User created", newUser);
+  }
   return profile;
 }
 
