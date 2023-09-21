@@ -410,3 +410,12 @@ This project uses ESLint for linting. That is configured in `.eslintrc.js`.
 We use [Prettier](https://prettier.io/) for auto-formatting in this project. It's recommended to install an editor
 plugin (like the [VSCode Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))
 to get auto-formatting on save. There is also a `npm run format` script you can run to format all files in the project.
+
+# Mocking for development
+
+If you don't have access to Xledger, you can use mock data instead.
+Set environment variable `MOCK_DATA=TRUE`.
+
+When logging in, use your normal miles-account.
+The mock-data will be used instead of fetching data from xledger.
+Your xledger id will be set to 999 unless you already have a user that has been assigned an id.
