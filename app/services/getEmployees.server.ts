@@ -1,4 +1,5 @@
 import { cache } from "~/services/cache";
+import { mockedEmployees } from "~/services/mockdata";
 
 /**
  * Get employees from Xledger
@@ -9,6 +10,9 @@ import { cache } from "~/services/cache";
  *  - code_gt: "0" - Code is the employeeNumber. We filter out users that haven't been assigned an employeeNumber
  */
 export const getEmployees = async () => {
+  // Check env if we should mock the data
+  if (process.env.MOCK_DATA === "TRUE") return mockedEmployees;
+
   let employees: Employee[] = [];
   let hasNextPage = true;
   let endCursor = null;

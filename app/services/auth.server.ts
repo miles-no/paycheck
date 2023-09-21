@@ -5,7 +5,7 @@ import { GoogleStrategy } from "remix-auth-google";
 import { SocialsProvider } from "remix-auth-socials";
 import invariant from "tiny-invariant";
 import { prisma } from "~/db.server";
-import { getEmployees } from "~/services/getEmployees.server";
+import { Employee, getEmployees } from "~/services/getEmployees.server";
 import { Role } from "~/enums/role";
 
 export const authenticator = new Authenticator(sessionStorage);
@@ -29,9 +29,15 @@ async function handleSocialAuthCallback({
   console.log("getting employes");
   const employees = await getEmployees();
 
-  const xledgerEmployeeMatch = employees.find(
-    (employee) => employee.email === profile.emails[0].value
-  );
+  // Decide if we should mock the data or not
+  let xledgerEmployeeMatch: { dbId: number } | Employee | undefined;
+  if (process.env.MOCK_DATA === "TRUE") {
+    console.log("USING MOCK USER XLEDGERID");
+    console.log("Note, it will try to create a user with this id unless it already exists in the database, then it will use that user instead");
+    xledgerEmployeeMatch = { dbId: 999 };
+  } else {
+    xledgerEmployeeMatch = employees.find(employee => employee.email === profile.emails[0].value);
+  }
 
   console.log("checking xledger match");
   if (!xledgerEmployeeMatch) {

@@ -1,4 +1,5 @@
 import { cache } from "~/services/cache";
+import { mockedTimesheets } from "~/services/mockdata";
 
 export function getMonthInterval(date: Date) {
   const newDate = new Date(date);
@@ -25,6 +26,9 @@ export function getTimesheetCacheKey(
 }
 
 export const getTimesheets = async (employeeDbId: string, date: Date) => {
+  // Check env if we should mock the data
+  if (process.env.MOCK_DATA === "TRUE") return mockedTimesheets;
+
   const { from, to } = getMonthInterval(date);
   // use cache if available
   const cacheKey = getTimesheetCacheKey(employeeDbId, from, to);
@@ -121,7 +125,7 @@ export const getTimesheets = async (employeeDbId: string, date: Date) => {
 
   // Cache the data
   cache.set(cacheKey, result);
-
+  console.log("Save for mocking:", JSON.stringify(result));
   return result;
 };
 // Types
