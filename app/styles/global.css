@@ -12,6 +12,9 @@
     transform: scale(1.02);
     box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
 }
+h1 {
+    color: #78E8DB;
+}
 
 a {
     transition: all 0.2s ease-in-out;
@@ -25,7 +28,7 @@ p > a, li > a, h1 > a, h2 > a, h3 > a, h4 > a, h5 > a, h6 > a {
 /* Show border around all links when they are hovered */
 a:hover, :focus {
     outline: none;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
+   
 }
 
 /*Search button styling*/

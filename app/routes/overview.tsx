@@ -3,6 +3,7 @@ import { EmployeeDetails, Role } from ".prisma/client";
 import { UsersIcon } from "@heroicons/react/24/outline";
 import { json, LoaderArgs } from "@remix-run/node";
 import { NavLink, useLoaderData } from "@remix-run/react";
+import { eventNames } from "process";
 import Navbar from "~/components/navbar";
 import { StatBox } from "~/components/statBox";
 import { requireAdminOrManager } from "~/services/user.server";
@@ -15,6 +16,8 @@ export async function loader({ params, context, request }: LoaderArgs) {
 
   return json({ metaKey, user });
 }
+
+
 
 export default function OverviewPage() {
   const { metaKey, user } = useLoaderData<typeof loader>();

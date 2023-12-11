@@ -10,6 +10,9 @@ import {
   getXledgerEmployeeData,
   RoleSection,
   XledgerInfoSection,
+  EmployeeNumber,
+  XledgerId,
+  XledgerEmail,
 } from "~/routes/employees/$employeeId";
 import { authenticator } from "~/services/auth.server";
 import { requireUser } from "~/services/user.server";
@@ -23,7 +26,7 @@ export async function loader({ params, context, request }: LoaderArgs) {
 
   // Get employee data from xledger
   const xledgerData = await getXledgerEmployeeData(
-    user?.employeeDetails?.xledgerId as string
+    user?.employeeDetails?.xledgerId as string,
   );
   const employee = xledgerData.data?.payrollRates?.edges?.[0]?.node?.employee;
   const yearlyFixedSalary =
@@ -54,34 +57,29 @@ export default function Dashboard() {
         }
       />
       <main className={"mx-auto flex max-w-7xl flex-col p-10"}>
-        <h1 className={"text-2xl font-bold"}>Hei, {user?.name}!</h1>
-        <p className={"text-gray-500"}>
-          Her kan du se din profil. Dersom noe er feil, ta kontakt med din
-          administrator.
-        </p>
+        <h1 className={"text-2xl font-bold"}>Hei {user?.name}!</h1>
+
         <Divider />
-        <RoleSection role={user?.role.name} />
+        <div className="flex flex-row justify-between gap-8">
+          <RoleSection role={user?.role.name} />
+          <EmployeeNumber code={employee?.code} />
+          <XledgerId employee={{ xledgerId: employee.xledgerId || "" }} />
+        </div>
         <Divider />
-        <XledgerInfoSection
-          employee={{
-            xledgerId: employee.xledgerId || "",
-            code: employee.code,
-            description: employee.description,
-            email: employee.email,
-            yearlyFixedSalary: employee.yearlyFixedSalary,
-          }}
-        />
-        <Divider />
-        <ExtraVariablesSection
-          employee={{
-            selfCostFactor: user?.employeeDetails?.selfCostFactor || 0,
-            xledgerId: user?.employeeDetails?.xledgerId || "",
-            provisionPercentage:
-              user?.employeeDetails?.provisionPercentage || 0,
-          }}
-          isSubmitting={false}
-          disabled
-        />
+        <div className="flex flex-row justify-between gap-8 items-stretch">
+          <XledgerEmail employee={{ XledgerEmail: employee.email || "" }} />
+          <ExtraVariablesSection
+            employee={{
+              selfCostFactor: user?.employeeDetails?.selfCostFactor || 0,
+              xledgerId: user?.employeeDetails?.xledgerId || "",
+              provisionPercentage:
+                user?.employeeDetails?.provisionPercentage || 0,
+              yearlyFixedSalary: employee?.yearlyFixedSalary || 0,
+            }}
+            isSubmitting={false}
+            disabled
+          />
+        </div>
         <div className={"flex justify-end"}>
           <a
             href={`/employees/${user?.employeeDetails?.xledgerId}`}

@@ -102,13 +102,13 @@ export async function loader({ params, context, request }: LoaderArgs) {
   }
 
   const employeeDetails = await getEmployeeDetailsByXledgerId(
-    employeeId as string
+    employeeId as string,
   );
   const selfCostFactor = employeeDetails?.selfCostFactor;
   const provisionPercentage = employeeDetails?.provisionPercentage;
 
   const xledgerEmployeeData = await getXledgerEmployeeData(
-    employeeId as string
+    employeeId as string,
   );
   const yearlyFixedSalary =
     xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.rate || 0;
@@ -202,28 +202,30 @@ export default function EmployeeEditPage() {
       />
       <main className={"mx-auto flex max-w-7xl flex-col p-10"}>
         <RoleSection role={selectedUserRole} />
-        <Divider />
-        <XledgerInfoSection
+
+        <EmployeeNumber code={employee?.code} />
+        <XledgerId
           employee={{
-            xledgerId: `${employee.xledgerId}`,
-            code: employee.code,
-            description: employee.description,
-            email: employee.email,
-            yearlyFixedSalary: employee.yearlyFixedSalary,
+            xledgerId: `${employee?.xledgerId}`,
           }}
         />
-        <Divider />
+        <XledgerEmail
+          employee={{
+            XledgerEmail: `${employee?.XledgerEmail}`,
+          }}
+        />
+
         <ExtraVariablesSection
           employee={{
             xledgerId: `${employee.xledgerId}`,
             provisionPercentage: employee.provisionPercentage || 0,
             selfCostFactor: employee.selfCostFactor || 0,
+            yearlyFixedSalary: employee.yearlyFixedSalary,
           }}
           isSubmitting={isSubmitting}
           disabled={!isAdminOrManager}
         />
         {/*links*/}
-        <Divider />
 
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <ExplanationHeader
@@ -275,11 +277,7 @@ export function RoleSection(props: { role?: string }) {
   const { role } = props;
   if (!role) return null;
   return (
-    <div className="md:grid md:grid-cols-3 md:gap-6">
-      <ExplanationHeader
-        title="Rolle"
-        description="Dette er rollen til brukeren i Miles PayCheck."
-      />
+    <div className="md:grid md:grid-cols-2 md:gap-6 w-full">
       <div className="mt-5 md:col-span-2 md:mt-0">
         <div className="overflow-hidden shadow sm:rounded-md">
           <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
@@ -299,18 +297,105 @@ export function RoleSection(props: { role?: string }) {
                   </label>
                 </Form>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+export function EmployeeNumber(props: { code: string }) {
+  const { code } = props;
+  return (
+    <div className="md:grid md:grid-cols-2 md:gap-6  w-full">
+      <div className="mt-5 md:col-span-2 md:mt-0">
+        <div className="overflow-hidden shadow sm:rounded-md">
+          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              {/*ansatt nummer*/}
               <div className="col-span-6 sm:col-span-3">
-                {/*  Let's explain the role*/}
+                <Form>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+                    Ansatt nr.
+                    <p
+                      className={
+                        "text-xl capitalize text-gray-900 dark:text-gray-100"
+                      }
+                    >
+                      <p
+                        className={
+                          "hashStyle text-xl text-gray-900 dark:text-gray-100"
+                        }
+                      >
+                        {code}
+                      </p>
+                    </p>
+                  </label>
+                </Form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+export function XledgerId(props: {
+  employee: {
+    xledgerId: string;
+  };
+}) {
+  const { employee } = props;
+  return (
+    <div className="md:grid md:grid-cols-2 md:gap-6  w-full">
+      <div className="mt-5 md:col-span-2 md:mt-0">
+        <div className="overflow-hidden shadow sm:rounded-md">
+          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              {/*xledgerid*/}
+              <div className="col-span-3 sm:col-span-3">
                 <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
-                  Forklaring
+                  Xledger ID
+                  <p
+                    className={
+                      "hashStyle text-xl text-gray-900 dark:text-gray-100"
+                    }
+                  >
+                    {employee?.xledgerId}
+                  </p>
                 </label>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  {role === Role.employee
-                    ? "Kan se egne timelister."
-                    : role === (Role.admin || Role.manager)
-                    ? "Kan se alle ansattes timelister og endre provisjonsprosent og selvkostfaktor."
-                    : "Denne brukeren har aldri logget inn og har derfor ingen rolle."}
-                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+export function XledgerEmail(props: {
+  employee: {
+    XledgerEmail: string;
+  };
+}) {
+  const { employee } = props;
+  return (
+    <div className="w-full h-full items-stretch ">
+      <div className="mt-5 md:col-span-2 md:mt-0">
+        <div className="overflow-hidden shadow sm:rounded-md">
+          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+            <div className="grid grid-cols-6 gap-6">
+              {/*XledgerEmail*/}
+              <div className="col-span-3 sm:col-span-3">
+                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+                  Epost
+                  <p
+                    className={
+                      "hashStyle text-xl text-gray-900 dark:text-gray-100"
+                    }
+                  >
+                    {employee?.XledgerEmail}
+                  </p>
+                </label>
               </div>
             </div>
           </div>
@@ -332,10 +417,6 @@ export function XledgerInfoSection(props: {
   const { employee } = props;
   return (
     <div className="md:grid md:grid-cols-3 md:gap-6">
-      <ExplanationHeader
-        title="Informasjon fra xledger"
-        description="Gå til xledger for å endre denne informasjonen."
-      />
       <div className="mt-5 md:col-span-2 md:mt-0">
         <div className="overflow-hidden shadow sm:rounded-md">
           <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
@@ -417,11 +498,7 @@ export function XledgerInfoSection(props: {
 }
 
 export function Divider() {
-  return (
-    <div className="py-5 sm:py-10" aria-hidden="true">
-      <div className="hidden border-t border-gray-200 dark:border-gray-700 sm:block" />
-    </div>
-  );
+  return <div className="py-5 sm:py-10" aria-hidden="true"></div>;
 }
 
 export function ExtraVariablesSection(props: {
@@ -430,19 +507,14 @@ export function ExtraVariablesSection(props: {
     selfCostFactor: number;
     xledgerId: string;
     provisionPercentage: number;
+    yearlyFixedSalary: number;
   };
   isSubmitting: boolean;
 }) {
   const { employee, isSubmitting, disabled } = props;
   return (
-    <div className="md:grid md:grid-cols-3 md:gap-6">
-      <ExplanationHeader
-        title="Ekstra informasjon"
-        description="Dette er individuelle variabler som er lagt inn i systemet for å
-        kunne beregne lønn. Denne er per dags dato ikke tilgengelig i
-        xledger."
-      />
-      <div className="mt-5 md:col-span-2 md:mt-0">
+    <div className ="w-full">
+      <div className="mt-5 md:col-span-2 md:mt-0 w-full">
         <Form method={"post"}>
           <input
             type="text"
@@ -451,77 +523,123 @@ export function ExtraVariablesSection(props: {
             id={"xledgerId"}
             name={"xledgerId"}
           />
-          <div className="overflow-hidden shadow sm:rounded-md">
+
+          <div className="overflow-hidden shadow sm:rounded-md w-full">
             <div className="bg-white px-4 py-5 dark:bg-opacity-10 sm:p-6">
-              <div className="grid grid-cols-6 gap-6">
+              <div className="grid grid-cols-3 gap-6">
                 <div className="col-span-6 sm:col-span-3">
-                  <label
-                    htmlFor="provision-percentage"
-                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100"
-                  >
-                    Provisjonsprosent
-                  </label>
-                  <span className={"redacted"}>
-                    {disabled ? (
-                      <p className="redacted align-baseline text-4xl font-semibold dark:text-gray-100">
-                        {employee?.provisionPercentage * 100}{" "}
-                        <span
-                          className={
-                            "align-baseline text-2xl text-gray-500 dark:text-gray-400"
-                          }
-                        >
-                          %
-                        </span>
-                      </p>
-                    ) : (
-                      <input
-                        type="number"
-                        name="provision-percentage"
-                        id="provision-percentage"
-                        autoComplete="provision-percentage"
-                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
-                        defaultValue={employee?.provisionPercentage * 100}
-                        disabled={disabled}
-                        required
-                        min={0}
-                        max={100}
-                      />
-                    )}
-                  </span>
+                  <div className="flex whitespace-nowrap items-center justify-between">
+                    <div>
+                      <label
+                        htmlFor="provision-percentage"
+                        className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100"
+                      >
+                        Fast årslønn
+                      </label>
+                    </div>
+                    <div className="mr-12">
+                      <span className={"redacted"}>
+                        {disabled ? (
+                          <p className="redacted align-baseline text-4xl font-semibold dark:text-gray-100">
+                            {employee?.yearlyFixedSalary}{" "}
+                            <span
+                              className={
+                                "align-baseline text-2xl text-gray-500 dark:text-gray-400"
+                              }
+                            >
+                              kr
+                            </span>
+                          </p>
+                        ) : (
+                          <input
+                            type="number"
+                            name="provision-percentage"
+                            id="provision-percentage"
+                            autoComplete="provision-percentage"
+                            className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
+                            defaultValue={employee?.yearlyFixedSalary}
+                            disabled={disabled}
+                            required
+                            min={0}
+                            max={100}
+                          />
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-6 sm:col-span-3">
+                  <div className="flex items-center justify-between">
+                    <label
+                      htmlFor="provision-percentage"
+                      className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100"
+                    >
+                      Provisjonsprosent
+                    </label>
+                    <span className={"redacted"}>
+                      {disabled ? (
+                        <p className="redacted align-baseline text-4xl font-semibold dark:text-gray-100">
+                          {employee?.provisionPercentage * 100}{" "}
+                          <span
+                            className={
+                              "align-baseline text-2xl text-gray-500 dark:text-gray-400"
+                            }
+                          >
+                            %
+                          </span>
+                        </p>
+                      ) : (
+                        <input
+                          type="number"
+                          name="provision-percentage"
+                          id="provision-percentage"
+                          autoComplete="provision-percentage"
+                          className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
+                          defaultValue={employee?.provisionPercentage * 100}
+                          disabled={disabled}
+                          required
+                          min={0}
+                          max={100}
+                        />
+                      )}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="col-span-6 sm:col-span-3">
-                  <label
-                    htmlFor="self-cost-factor"
-                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100"
-                  >
-                    Selvkostfaktor
-                  </label>
-                  <span className={"redacted"}>
-                    {disabled ? (
-                      <p
-                        className={
-                          "align-baseline text-4xl font-semibold text-gray-900 dark:text-gray-100"
-                        }
-                      >
-                        {employee?.selfCostFactor}
-                      </p>
-                    ) : (
-                      <input
-                        type="number"
-                        name="self-cost-factor"
-                        id="self-cost-factor"
-                        step={0.01}
-                        autoComplete="self-cost-factor"
-                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
-                        defaultValue={employee?.selfCostFactor}
-                        disabled={disabled}
-                        required
-                        min={0}
-                        max={100}
-                      />
-                    )}
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <label
+                      htmlFor="self-cost-factor"
+                      className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100"
+                    >
+                      Selvkostfaktor
+                    </label>
+                    <span className={"redacted"}>
+                      {disabled ? (
+                        <p
+                          className={
+                            "align-baseline text-4xl font-semibold text-gray-900 dark:text-gray-100"
+                          }
+                        >
+                          x {employee?.selfCostFactor} av fast lønn
+                        </p>
+                      ) : (
+                        <input
+                          type="number"
+                          name="self-cost-factor"
+                          id="self-cost-factor"
+                          step={0.01}
+                          autoComplete="self-cost-factor"
+                          className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-black dark:bg-opacity-10 dark:text-gray-100 dark:placeholder-gray-400 dark:ring-gray-600 dark:focus:ring-gray-400 sm:text-sm sm:leading-6"
+                          defaultValue={employee?.selfCostFactor}
+                          disabled={disabled}
+                          required
+                          min={0}
+                          max={100}
+                        />
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

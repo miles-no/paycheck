@@ -99,7 +99,7 @@ export default function App() {
         <Links />
         <title>Miles PayCheck</title>
       </head>
-      <body className="h-full bg-gray-100 dark:bg-black dark:text-white">
+      <body className="h-full  dark:bg-black dark:text-white bg-[#004047]">
         {commands.length > 0 && (
           <CommandPalette commands={commands} metaKey={metaKey} />
         )}

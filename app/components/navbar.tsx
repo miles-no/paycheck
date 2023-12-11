@@ -4,6 +4,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { useLocation } from "react-router";
 import { Role as RoleEnum } from "~/enums/role";
+import PoweredBy from "../assets/PoweredBy.js"
 
 const userNavigation = [
   { name: "Min profil", href: "/profile" },
@@ -18,12 +19,15 @@ export default function Navbar(props: {
 
   const navigation = [
     {
-      name: "Min timeliste",
+      name: "Timeliste",
       href: `/employees/${
         props.user?.employeeDetails?.xledgerId
       }/timesheets/${new Date().getFullYear()}/${new Date().getMonth() + 1}`,
       //   Todo: make the link highlight work for sub-pages as well
     },
+    { name: "Oversikt", href: "/overview" },
+        { name: "Ansatte", href: "/employees" },
+        { name: "Brukere", href: "/users" },
     ...(isAdmin
       ? [
         { name: "Oversikt", href: "/overview" },
@@ -34,23 +38,45 @@ export default function Navbar(props: {
   ];
 
   return (
+    <div className="bg-white h-100">
     <Disclosure
       as="header"
-      className="bg-white bg-opacity-30 shadow dark:bg-black dark:bg-opacity-90"
+      className=" bg-opacity-30 shadow dark:bg-black dark:bg-opacity-90"
     >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:divide-y lg:divide-gray-700 lg:px-8">
-            <div className="relative flex h-16 justify-between">
-              <div className="relative z-10 flex px-2 lg:px-0">
-                <div className="flex flex-shrink-0 items-center">
-                  <img
-                    className="block h-8 w-auto"
-                    src="/miles_logo_red_pms.png"
-                    alt="Miles"
-                  />
-                </div>
+            <div className="relative flex h-16 justify-between" >
+              <div className="relative z-10 flex px-2 lg:px-0  divide-x-2 divide-black py-2 gap-6">
+                <a href={"/profile"}
+                
+                className="flex flex-shrink-0 items-center"
+                 >
+                  <PoweredBy/>
+                </a>
+              <nav
+              className=" lg:flex lg:space-x-8 lg:py-2 px-6 flex items-center"
+              aria-label="Global"
+            >
+              {navigation.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className={`${
+                    location.pathname === item.href 
+                      ? "border-b-2 border-[#bb413d] bg-opacity-50 font-bold text-black dark:border-gray-700 dark:text-gray-300"
+                      : "border-b-2 border-transparent text-black font-medium inline-flex items-center text-sm "
+                  }  py-2`}
+                  aria-current={
+                    location.pathname === item.href ? "page" : undefined
+                  }
+                >
+                  {item.name}
+                </a>
+              ))}
+            </nav>
               </div>
+             
               <div className="relative z-10 flex items-center lg:hidden">
                 {/* Mobile menu button */}
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md border border-transparent p-2 text-gray-400 hover:border-white hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -103,28 +129,8 @@ export default function Navbar(props: {
                   </Transition>
                 </Menu>
               </div>
+          
             </div>
-            <nav
-              className="hidden lg:flex lg:space-x-8 lg:py-2"
-              aria-label="Global"
-            >
-              {navigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={`${
-                    location.pathname === item.href
-                      ? "border-b border-black bg-opacity-50 font-bold text-gray-900 dark:border-gray-700 dark:text-gray-300"
-                      : "border-b border-transparent text-gray-500 hover:border-gray-300 dark:hover:border-gray-700 dark:hover:text-gray-300"
-                  } inline-flex items-center py-2 px-3 text-sm font-medium`}
-                  aria-current={
-                    location.pathname === item.href ? "page" : undefined
-                  }
-                >
-                  {item.name}
-                </a>
-              ))}
-            </nav>
           </div>
 
           <Disclosure.Panel as="nav" className="lg:hidden" aria-label="Global">
@@ -182,5 +188,6 @@ export default function Navbar(props: {
         </>
       )}
     </Disclosure>
+    </div>
   );
 }
