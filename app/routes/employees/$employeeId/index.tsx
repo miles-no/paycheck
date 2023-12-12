@@ -30,6 +30,7 @@ import {
 } from "~/services/user.server";
 import { isAdminOrManager } from "~/utils/isAdminOrManager";
 
+
 interface xledgerEmployeeResponse {
   data: {
     payrollRates: {
@@ -280,7 +281,7 @@ export function RoleSection(props: { role?: string }) {
     <div className="md:grid md:grid-cols-2 md:gap-6 w-full">
       <div className="mt-5 md:col-span-2 md:mt-0">
         <div className="overflow-hidden shadow sm:rounded-md">
-          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+          <div className="bg-[#EBFFFD] bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*NAVN*/}
               <div className="col-span-6 sm:col-span-3">
@@ -310,7 +311,7 @@ export function EmployeeNumber(props: { code: string }) {
     <div className="md:grid md:grid-cols-2 md:gap-6  w-full">
       <div className="mt-5 md:col-span-2 md:mt-0">
         <div className="overflow-hidden shadow sm:rounded-md">
-          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+          <div className="bg-[#EBFFFD] bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*ansatt nummer*/}
               <div className="col-span-6 sm:col-span-3">
@@ -350,7 +351,7 @@ export function XledgerId(props: {
     <div className="md:grid md:grid-cols-2 md:gap-6  w-full">
       <div className="mt-5 md:col-span-2 md:mt-0">
         <div className="overflow-hidden shadow sm:rounded-md">
-          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+          <div className="bg-[#EBFFFD] bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*xledgerid*/}
               <div className="col-span-3 sm:col-span-3">
@@ -379,14 +380,10 @@ export function XledgerEmail(props: {
 }) {
   const { employee } = props;
   return (
-    <div className="w-full h-full items-stretch ">
-      <div className="mt-5 md:col-span-2 md:mt-0">
-        <div className="overflow-hidden shadow sm:rounded-md">
-          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
-            <div className="grid grid-cols-6 gap-6">
+    <div className="w-9/12 h-full items-stretch overflow-hidden shadow sm:rounded-md">
+          <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6 h-full">
               {/*XledgerEmail*/}
-              <div className="col-span-3 sm:col-span-3">
-                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100 my-24   justify-center">
                   Epost
                   <p
                     className={
@@ -396,11 +393,7 @@ export function XledgerEmail(props: {
                     {employee?.XledgerEmail}
                   </p>
                 </label>
-              </div>
-            </div>
           </div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -419,7 +412,7 @@ export function XledgerInfoSection(props: {
     <div className="md:grid md:grid-cols-3 md:gap-6">
       <div className="mt-5 md:col-span-2 md:mt-0">
         <div className="overflow-hidden shadow sm:rounded-md">
-          <div className="bg-white bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
+          <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*NAVN*/}
               <div className="col-span-6 sm:col-span-3">
@@ -525,8 +518,8 @@ export function ExtraVariablesSection(props: {
           />
 
           <div className="overflow-hidden shadow sm:rounded-md w-full">
-            <div className="bg-white px-4 py-5 dark:bg-opacity-10 sm:p-6">
-              <div className="grid grid-cols-3 gap-6">
+            <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6">
+              <div className="grid grid-cols-2 gap-6">
                 <div className="col-span-6 sm:col-span-3">
                   <div className="flex whitespace-nowrap items-center justify-between">
                     <div>
@@ -537,7 +530,7 @@ export function ExtraVariablesSection(props: {
                         Fast årslønn
                       </label>
                     </div>
-                    <div className="mr-12">
+                    <div className="">
                       <span className={"redacted"}>
                         {disabled ? (
                           <p className="redacted align-baseline text-4xl font-semibold dark:text-gray-100">
@@ -689,7 +682,7 @@ function NotificationContainer(props: {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+          <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-[#EBFFFD] shadow-lg ring-1 ring-black ring-opacity-5">
             <div className="p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
@@ -719,7 +712,7 @@ function NotificationContainer(props: {
                 <div className="ml-4 flex flex-shrink-0">
                   <button
                     type="button"
-                    className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="inline-flex rounded-md bg-[#EBFFFD] text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     onClick={() => {
                       setShow(false);
                     }}

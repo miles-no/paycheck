@@ -66,7 +66,7 @@ export default function Dashboard() {
           <XledgerId employee={{ xledgerId: employee.xledgerId || "" }} />
         </div>
         <Divider />
-        <div className="flex flex-row justify-between gap-8 items-stretch">
+        <div className="flex flex-row justify-between gap-8 items-stretch h-full">
           <XledgerEmail employee={{ XledgerEmail: employee.email || "" }} />
           <ExtraVariablesSection
             employee={{

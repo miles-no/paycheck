@@ -1,5 +1,4 @@
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,14 +6,9 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from "@remix-run/react";
-
 import tailwindStylesheetUrl from "./styles/tailwind.css";
 import globalStylesheetUrl from "./styles/global.css";
-import { getEmployees } from "~/services/getEmployees.server";
-import { optionalUser } from "~/services/user.server";
-import CommandPalette from "~/components/command-palette";
 
 export const links: LinksFunction = () => {
   return [
@@ -35,63 +29,7 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export interface Command {
-  id: string;
-  name: string;
-  url: string;
-  icon: string;
-}
-
-export const pages: Command[] = [
-  { id: "home", name: "Hjem", url: "/", icon: "home" },
-  { id: "logout", name: "Logg ut", url: "/logout", icon: "logout" },
-  { id: "profile", name: "Profil", url: "/profile", icon: "user" },
-];
-export const adminPages: Command[] = [
-  { id: "overview", name: "Oversikt", url: "/overview", icon: "chart-bar" },
-  { id: "employees", name: "Ansatte", url: "/employees", icon: "users" },
-  {id:"report", name:"Last ned rapport av forrige måned", url:"/report", icon:"document-report" }
-];
-export async function loader({ request }: LoaderArgs) {
-  // get the meta key from the request headers
-  const metaKey = request.headers.get("user-agent")?.includes("Mac")
-    ? "⌘"
-    : "ctrl";
-
-  const user = await optionalUser(request);
-  if (!user) return json({ commands: [], metaKey });
-
-  // todo: adjust commands based on the logged in user
-  let commands: Command[] = [...pages];
-  if (user.role.name === "admin" || user.role.name === "manager") {
-    const employees = await getEmployees();
-    const year = new Date().getFullYear();
-    const month = new Date().getMonth() + 1;
-    commands = [
-      ...pages,
-      ...adminPages,
-      ...employees.map((employee) => ({
-        id: `timesheet-${employee.dbId}`,
-        name: `Timeliste - ${employee.description}`,
-        url: `/employees/${employee.dbId}/timesheets/${year}/${month}`,
-        icon: "clock",
-      })),
-      ...employees.map((employee) => ({
-        id: `employee-${employee.dbId}`,
-        name: `Profil - ${employee.description}`,
-        url: `/employees/${employee.dbId}`,
-        icon: "user",
-      })),
-    ];
-  }
-  return json({
-    commands: commands,
-    metaKey,
-  });
-}
-
 export default function App() {
-  const { commands, metaKey } = useLoaderData<typeof loader>();
   return (
     <html lang="nb-NO" className="font-display h-full">
       <head>
@@ -100,9 +38,6 @@ export default function App() {
         <title>Miles PayCheck</title>
       </head>
       <body className="h-full  dark:bg-black dark:text-white bg-[#004047]">
-        {commands.length > 0 && (
-          <CommandPalette commands={commands} metaKey={metaKey} />
-        )}
         <Outlet />
         <ScrollRestoration />
         <Scripts />

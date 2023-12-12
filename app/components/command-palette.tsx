@@ -7,13 +7,12 @@ import {
   HomeIcon,
   UserCircleIcon,
   UsersIcon,
-  DocumentIcon
+  DocumentIcon,
 } from "@heroicons/react/24/outline";
 import { Fragment, useEffect, useState } from "react";
-import type { Command } from "~/root";
 
 function classNames({ classes }: { classes: any[] }) {
-  return classes.filter(Boolean).join(" ");
+  return classes?.filter(Boolean).join(" ");
 }
 
 function getIcon(icon: string) {
@@ -76,15 +75,17 @@ export default function CommandPalette(props: {
 }) {
   const { commands } = props;
   const [query, setQuery] = useState("");
-
   const [open, setOpen] = useState(false);
   const filteredPeople =
     query === ""
       ? []
-      : commands.filter((person) => {
-        return person.name.toLowerCase().includes(query.toLowerCase());
-      });
+      : commands?.filter((person) => {
+          return person.name.toLowerCase().includes(query.toLowerCase());
+        });
 
+  if (!commands ) {
+    return <></>;
+  }
   //Keyboard shortcut to open the command palette (cmd + k)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -148,12 +149,12 @@ export default function CommandPalette(props: {
                     />
                   </div>
 
-                  {filteredPeople.length > 0 && (
+                  {filteredPeople?.length > 0 && (
                     <Combobox.Options
                       static
                       className="max-h-72 scroll-py-2 overflow-y-auto py-2 text-sm text-gray-800 dark:text-white"
                     >
-                      {filteredPeople.map((command) => (
+                      {filteredPeople?.map((command) => (
                         <Combobox.Option
                           key={command.id}
                           value={command}
@@ -162,7 +163,7 @@ export default function CommandPalette(props: {
                               classes: [
                                 "cursor-default select-none px-4 py-2",
                                 active &&
-                                "bg-gray-200 bg-opacity-90 dark:bg-gray-700",
+                                  "bg-gray-200 bg-opacity-90 dark:bg-gray-700",
                                 "flex gap-2",
                                 "dark:text-white",
                               ],
@@ -176,7 +177,7 @@ export default function CommandPalette(props: {
                     </Combobox.Options>
                   )}
 
-                  {query !== "" && filteredPeople.length === 0 && (
+                  {query !== "" && filteredPeople?.length === 0 && (
                     <p className="p-4 text-sm text-gray-500 dark:text-white">
                       No actions found for "{query}"
                     </p>
@@ -188,21 +189,17 @@ export default function CommandPalette(props: {
         </Dialog>
       </Transition.Root>
       {/*  Let's circle search-icon button down right to open the command palette*/}
-      <span className={`${open && "hidden"}`}>
+      <span className={`${open}`}>
         <button
           type="button"
-          className={`searchButton hideInPrint fixed bottom-12 right-12 flex rounded-full border bg-white bg-opacity-90 p-4 shadow-lg dark:bg-black `}
+          className={`searchButton `}
           onClick={() => setOpen(true)}
         >
           <span className="sr-only">Open command palette</span>
-          <MagnifyingGlassIcon
-            className="h-6 w-6 text-gray-400 dark:text-white"
-            aria-hidden="true"
-          />
-          <span className="ml-2 hidden group-hover:inline-block">Søk</span>
-          <span className={"ml-2 hidden pl-3 group-hover:inline-block"}>
-            <kbd>{props.metaKey}</kbd> + <kbd>K</kbd>
-          </span>
+
+          <p className="border-b-2 border-transparent text-black font-medium inline-flex items-center text-sm   py-2">
+            Søk
+          </p>
         </button>
       </span>
     </div>
