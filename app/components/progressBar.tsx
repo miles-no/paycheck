@@ -9,13 +9,13 @@ export function ProgressBar(props: {
 }) {
   const { totalHoursWorked, totalHoursInvoiced, monthlyPay } = props;
   const maxHours = 172.5;
- const percentage = (totalHoursInvoiced  / (maxHours)) * 100;
-  const percentageProgress = (totalHoursWorked / maxHours) * 100;
+ const percentage = ((totalHoursInvoiced != null ? totalHoursInvoiced : 1)   / (maxHours)) * 100;
+  const percentageProgress = ((totalHoursWorked != null ? totalHoursWorked : 1) / maxHours) * 100;
   const pay = (monthlyPay as { pay?: number }).pay;
 
    console.log(percentage, percentageProgress, "asdf")
 
-
+// fix css positioning of the progress bar
   return (
     <div>
       <div className="flex flex-row justify-between text-white">

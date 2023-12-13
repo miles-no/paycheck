@@ -197,7 +197,7 @@ export const mockedTimesheets = {
           "node": {
             "assignmentDate": "2023-01-06",
             "workingHours": "20.5000",
-            "invoiceHours": "2.5000",
+            "invoiceHours": "25.5000",
             "hourlyRevenueCurrency": "1200.0000",
             "projectDbId": 28372116,
             "project": {
