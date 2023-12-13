@@ -19,6 +19,7 @@ import { requireUser } from "~/services/user.server";
 import { aggregateProjectSummary } from "~/utils/aggregateProjectSummary.server";
 import type { ErrorResponse } from "@remix-run/router";
 import { calculateMonthlyPayFromSubTotal } from "~/utils/calculateMonthlyPayFromTimesheet";
+import { ProgressBar } from "~/components/progressBar";
 
 function getMainProject(
   timesheetQueryResponse: XLedgerGraphQLTimesheetQueryResponse
@@ -32,6 +33,7 @@ function getMainProject(
   }
   return mainProject;
 }
+
 
 export async function loader({ params, request }: LoaderArgs) {
   const { employeeId, year, month } = params;
@@ -134,6 +136,20 @@ export default function MonthlyTimesheetPage() {
     "nb-NO",
     { month: "long" }
   );
+  console.log("asdf", totalByProject)
+
+   const totalHoursWorked = Object.values(totalByProject || {}).reduce(
+     (acc, cur) => acc + cur.hours.worked,
+     0
+   );
+   console.log("totalHoursWorked", totalHoursWorked)
+
+  const totalHoursInvoiced = Object.values(totalByProject || {}).reduce(
+    (acc, cur) => acc + cur.hours.invoiced,
+    0
+  );
+  console.log("totalHoursInvoiced", totalHoursInvoiced)
+
 
   return (
     <>
@@ -147,6 +163,7 @@ export default function MonthlyTimesheetPage() {
       />
       <main className={"mx-auto flex max-w-7xl flex-col p-10"}>
         <TimeSheetNav employeeId={employeeId} year={year} month={month} />
+        <ProgressBar totalHoursWorked={totalHoursWorked} totalHoursInvoiced={totalHoursInvoiced} monthlyPay={monthlyPay} />
         <div className="bg-white bg-opacity-50 px-4 pt-8 pb-8 dark:bg-black dark:bg-opacity-10 sm:px-6 lg:px-8">
           <div className="sm:flex sm:items-center">
             <div className="sm:flex-auto">

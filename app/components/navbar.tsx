@@ -6,20 +6,8 @@ import { useLocation } from "react-router";
 import { Role as RoleEnum } from "~/enums/role";
 import PoweredBy from "../assets/PoweredBy.js";
 import CommandPalette from "~/components/command-palette";
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
-} from "@remix-run/react";
 import { getEmployees } from "~/services/getEmployees.server";
-import { optionalUser } from "~/services/user.server";
-import { debug } from "console";
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 export interface Command {
   id: string;
   name: string;
@@ -48,8 +36,6 @@ const userNavigation = [
   { name: "Logg ut", href: "/logout" },
 ];
 
-
-
 export default function Navbar(props: {
   user?: User & { role: Role; employeeDetails: EmployeeDetails | null };
 }) {
@@ -59,27 +45,28 @@ export default function Navbar(props: {
   const [commands, setCommands] = useState<{
     commands: Command[];
     metaKey: string;
-}>({commands: [], metaKey: ""})
+  }>({ commands: [], metaKey: "" });
 
-  useEffect( () => {
+  useEffect(() => {
     const searchSomething = async () => {
-      const data = await searchStuff()
-      setCommands(data)
-    }
+      const data = await searchStuff();
+      setCommands(data);
+    };
 
-    searchSomething()
-  }, [])
+    searchSomething();
+  }, []);
 
-  const  searchStuff = async () : Promise<{commands: Command[], metaKey: string}>=> {
-    const metaKey = navigator.userAgent.includes("Mac")
-      ? "⌘"
-      : "ctrl";
+  const searchStuff = async (): Promise<{
+    commands: Command[];
+    metaKey: string;
+  }> => {
+    const metaKey = navigator.userAgent.includes("Mac") ? "⌘" : "ctrl";
     const user = props?.user;
     if (!user) return { commands: [], metaKey };
-  
+
     // todo: adjust commands based on the logged in user
     let commands: Command[] = [...pages];
-   
+
     if (user.role.name === "admin" || user.role.name === "manager") {
       const employees = await getEmployees();
       const year = new Date().getFullYear();
@@ -105,9 +92,7 @@ export default function Navbar(props: {
       commands: commands,
       metaKey,
     };
-
-
-  }
+  };
 
   const navigation = [
     {
@@ -167,7 +152,10 @@ export default function Navbar(props: {
                       </a>
                     ))}
                     <div>
-                      <CommandPalette commands={commands.commands} metaKey={commands.metaKey} />
+                      <CommandPalette
+                        commands={commands.commands}
+                        metaKey={commands.metaKey}
+                      />
                     </div>
                   </nav>
                 </div>
