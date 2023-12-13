@@ -118,16 +118,18 @@ body {
     align-items: center;
     position: relative;
     background-color: #CCE9EC;
+    
 
 }
 .progress-bar__fill{
-    border-radius: 0 20px 20px 0;
+    border-radius: 20px;
     border-right:2px #004047 solid;
     display:flex;
     flex-direction: row;
     white-space: nowrap;
    justify-content: end;
    background-color: #B3DDE2;
+    position: absolute;
    
 }
 .progress-bar__fillfirst{
@@ -138,6 +140,7 @@ body {
     white-space: nowrap;
    justify-content:  end;
    border-right:2px #004047 solid;
+   position: absolute;
 }
 .progress_bar__filllast{
     background-color: #CCE9EC;
@@ -146,7 +149,4 @@ body {
     flex-direction: row;
     white-space: nowrap;
    justify-content:  end;
-   border-right:2px #004047 solid;
- 
-   position: absolute;
 }
