@@ -103,9 +103,7 @@ export default function Navbar(props: {
       }`,
       //   Todo: make the link highlight work for sub-pages as well
     },
-    { name: "Oversikt", href: "/overview" },
-    { name: "Ansatte", href: "/employees" },
-    { name: "Brukere", href: "/users" },
+   
     ...(isAdmin
       ? [
           { name: "Oversikt", href: "/overview" },
@@ -132,7 +130,7 @@ export default function Navbar(props: {
                     <PoweredBy />
                   </a>
                   <nav
-                    className=" lg:flex lg:space-x-8 lg:py-2 px-6 flex items-center"
+                    className="  space-x-8 py-2 px-6 flex items-center"
                     aria-label="Global"
                   >
                     {navigation.map((item) => (
@@ -160,18 +158,8 @@ export default function Navbar(props: {
                   </nav>
                 </div>
 
-                <div className="relative z-10 flex items-center lg:hidden">
-                  {/* Mobile menu button */}
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md border border-transparent p-2 text-gray-400 hover:border-white hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                    <span className="sr-only">Open menu</span>
-                    {open ? (
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                    )}
-                  </Disclosure.Button>
-                </div>
-                <div className="hidden lg:relative lg:z-10 lg:ml-4 lg:flex lg:items-center flex-col justify-center gap-2">
+              
+                <div className=" relative z-10 ml-4 flex items-center flex-col justify-center gap-2">
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-4 flex-shrink-0">
                     <div>
@@ -212,7 +200,7 @@ export default function Navbar(props: {
                       </Menu.Items>
                     </Transition>
                   </Menu>
-                  <div className="text-[#B72926] text-xs">
+                  <div className="text-[#B72926] text-xs whitespace-nowrap">
                     <p>{props?.user?.name}</p>
                   </div>
                 </div>

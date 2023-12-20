@@ -45,243 +45,12 @@ export const mockedTimesheets = {
             }
           }
         },
-        {
-          "cursor": "1",
-          "node": {
-            "assignmentDate": "2023-01-02",
-            "workingHours": "6.5000",
-            "invoiceHours": "6.5000",
-            "hourlyRevenueCurrency": "1370.0000",
-            "projectDbId": 28336822,
-            "project": {
-              "description": "Code Fusion X",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "2",
-          "node": {
-            "assignmentDate": "2023-01-03",
-            "workingHours": "4.0000",
-            "invoiceHours": "4.0000",
-            "hourlyRevenueCurrency": "1200.0000",
-            "projectDbId": 28372116,
-            "project": {
-              "description": "Lucid Sky MVP",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "3",
-          "node": {
-            "assignmentDate": "2023-01-03",
-            "workingHours": "3.5000",
-            "invoiceHours": "3.5000",
-            "hourlyRevenueCurrency": "1370.0000",
-            "projectDbId": 28336822,
-            "project": {
-              "description": "Code Fusion X",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "4",
-          "node": {
-            "assignmentDate": "2023-01-04",
-            "workingHours": "7.5000",
-            "invoiceHours": "7.5000",
-            "hourlyRevenueCurrency": "1200.0000",
-            "projectDbId": 28372116,
-            "project": {
-              "description": "Lucid Sky MVP",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "5",
-          "node": {
-            "assignmentDate": "2023-01-05",
-            "workingHours": "2.5000",
-            "invoiceHours": "2.5000",
-            "hourlyRevenueCurrency": "1200.0000",
-            "projectDbId": 28372116,
-            "project": {
-              "description": "Lucid Sky MVP",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "6",
-          "node": {
-            "assignmentDate": "2023-01-05",
-            "workingHours": "5.0000",
-            "invoiceHours": "5.0000",
-            "hourlyRevenueCurrency": "1370.0000",
-            "projectDbId": 28336822,
-            "project": {
-              "description": "Code Fusion X",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "7",
-          "node": {
-            "assignmentDate": "2023-01-06",
-            "workingHours": "5.0000",
-            "invoiceHours": "5.0000",
-            "hourlyRevenueCurrency": "1370.0000",
-            "projectDbId": 28336822,
-            "project": {
-              "description": "Code Fusion X",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "8",
-          "node": {
-            "assignmentDate": "2023-01-06",
-            "workingHours": "2.5000",
-            "invoiceHours": "2.5000",
-            "hourlyRevenueCurrency": "1200.0000",
-            "projectDbId": 28372116,
-            "project": {
-              "description": "Lucid Sky MVP",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "9",
-          "node": {
-            "assignmentDate": "2023-01-09",
-            "workingHours": "5.5000",
-            "invoiceHours": "5.5000",
-            "hourlyRevenueCurrency": "1200.0000",
-            "projectDbId": 28372116,
-            "project": {
-              "description": "Lucid Sky MVP",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "10",
-          "node": {
-            "assignmentDate": "2023-01-09",
-            "workingHours": "2.0000",
-            "invoiceHours": "2.0000",
-            "hourlyRevenueCurrency": "1370.0000",
-            "projectDbId": 28336822,
-            "project": {
-              "description": "Code Fusion X",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
-        {
-          "cursor": "11",
-          "node": {
-            "assignmentDate": "2023-01-10",
-            "workingHours": "7.5000",
-            "invoiceHours": "7.5000",
-            "hourlyRevenueCurrency": "1200.0000",
-            "projectDbId": 28372116,
-            "project": {
-              "description": "Lucid Sky MVP",
-              "projectGroup": {
-                "code": "201"
-              }
-            },
-            "activity": {
-              "code": "A-002",
-              "dbId": 28168999,
-              "description": "Utvikling"
-            }
-          }
-        },
+ 
         {
           "cursor": "12",
           "node": {
             "assignmentDate": "2023-01-11",
             "workingHours": "7.5000",
-            "invoiceHours": "7.5000",
             "hourlyRevenueCurrency": "1200.0000",
             "projectDbId": 28372116,
             "project": {
@@ -302,7 +71,6 @@ export const mockedTimesheets = {
           "node": {
             "assignmentDate": "2023-01-12",
             "workingHours": "7.5000",
-            "invoiceHours": "7.5000",
             "hourlyRevenueCurrency": "1200.0000",
             "projectDbId": 28372116,
             "project": {
@@ -344,7 +112,6 @@ export const mockedTimesheets = {
           "node": {
             "assignmentDate": "2023-01-13",
             "workingHours": "6.0000",
-            "invoiceHours": "6.0000",
             "hourlyRevenueCurrency": "1200.0000",
             "projectDbId": 28372116,
             "project": {

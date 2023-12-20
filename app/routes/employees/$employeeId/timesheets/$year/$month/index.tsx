@@ -2,7 +2,13 @@ import type { EmployeeDetails, Role, User } from ".prisma/client";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import type { LoaderArgs, ActionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, isRouteErrorResponse, useLoaderData, useParams, useRouteError } from "@remix-run/react";
+import {
+  Form,
+  isRouteErrorResponse,
+  useLoaderData,
+  useParams,
+  useRouteError,
+} from "@remix-run/react";
 import Navbar from "~/components/navbar";
 import { TimeSheetNav } from "~/components/timeSheetNav";
 import { getEmployeeDetailsByXledgerId } from "~/models/employeeDetails.server";
@@ -13,7 +19,7 @@ import type { XLedgerGraphQLTimesheetQueryResponse } from "~/services/getTimeshe
 import {
   getMonthInterval,
   getTimesheetCacheKey,
-  getTimesheets
+  getTimesheets,
 } from "~/services/getTimesheet.server";
 import { requireUser } from "~/services/user.server";
 import { aggregateProjectSummary } from "~/utils/aggregateProjectSummary.server";
@@ -22,18 +28,20 @@ import { calculateMonthlyPayFromSubTotal } from "~/utils/calculateMonthlyPayFrom
 import { ProgressBar } from "~/components/progressBar";
 
 function getMainProject(
-  timesheetQueryResponse: XLedgerGraphQLTimesheetQueryResponse
+  timesheetQueryResponse: XLedgerGraphQLTimesheetQueryResponse,
 ) {
   const totalByProject = aggregateProjectSummary(timesheetQueryResponse);
   let mainProject;
   for (const project in totalByProject) {
-    if (!mainProject || totalByProject[project].hours.invoiced > mainProject.hours.invoiced) {
+    if (
+      !mainProject ||
+      totalByProject[project].hours.invoiced > mainProject.hours.invoiced
+    ) {
       mainProject = totalByProject[project];
     }
   }
   return mainProject;
 }
-
 
 export async function loader({ params, request }: LoaderArgs) {
   const { employeeId, year, month } = params;
@@ -51,21 +59,21 @@ export async function loader({ params, request }: LoaderArgs) {
   //Todo: Double check that we are fetching the correct timesheet
   const timesheets = await getTimesheets(
     `${employeeId}`,
-    new Date(Number(year), Number(month))
+    new Date(Number(year), Number(month)),
   );
   if (!timesheets) throw new Error("No timesheets found");
 
   const employeeDetails = await getEmployeeDetailsByXledgerId(
-    employeeId as string
+    employeeId as string,
   );
   const selfCostFactor = employeeDetails?.selfCostFactor;
   const provisionPercentage = employeeDetails?.provisionPercentage;
 
   //to get employee name, we need to get it from the employees list
   const employees = await getEmployees();
-  
+
   const employee = employees.find(
-    (employee) => employee.dbId.toString() === employeeId
+    (employee) => employee.dbId.toString() === employeeId,
   );
 
   if (selfCostFactor == null || provisionPercentage == null) {
@@ -77,11 +85,11 @@ export async function loader({ params, request }: LoaderArgs) {
   const totalByProject = aggregateProjectSummary(timesheets);
   const subTotal = Object.values(totalByProject || {}).reduce(
     (acc, cur) => acc + cur.sum.earned,
-    0
+    0,
   );
 
   const xledgerEmployeeData = await getXledgerEmployeeData(
-    employeeId as string
+    employeeId as string,
   );
   const yearlyFixedSalary =
     xledgerEmployeeData?.data?.payrollRates?.edges?.[0]?.node?.rate || 0;
@@ -91,13 +99,20 @@ export async function loader({ params, request }: LoaderArgs) {
     subTotal,
     yearlyFixedSalary,
     selfCostFactor,
-    provisionPercentage
+    provisionPercentage,
   );
 
   // Select the project with the highest sum of hours
   const mainProject = getMainProject(timesheets);
 
-  return json({ timesheets, monthlyPay, totalByProject, mainProject, user, employee });
+  return json({
+    timesheets,
+    monthlyPay,
+    totalByProject,
+    mainProject,
+    user,
+    employee,
+  });
 }
 
 export const action = async ({ request, params }: ActionArgs) => {
@@ -134,22 +149,21 @@ export default function MonthlyTimesheetPage() {
   const { employeeId, year, month } = useParams();
   const monthName = new Date(Number(year), Number(month) - 1).toLocaleString(
     "nb-NO",
-    { month: "long" }
+    { month: "long" },
   );
-  console.log("asdf", totalByProject)
+  console.log("asdf", totalByProject);
 
-   const totalHoursWorked = Object.values(totalByProject || {}).reduce(
-     (acc, cur) => acc + cur.hours.worked,
-     0
-   );
-   console.log("totalHoursWorked", totalHoursWorked)
+  const totalHoursWorked = Object.values(totalByProject || {}).reduce(
+    (acc, cur) => acc + cur.hours.worked,
+    0,
+  );
+  console.log("totalHoursWorked", totalHoursWorked);
 
   const totalHoursInvoiced = Object.values(totalByProject || {}).reduce(
     (acc, cur) => acc + cur.hours.invoiced,
-    0
+    0,
   );
-  console.log("totalHoursInvoiced", totalHoursInvoiced)
-
+  console.log("totalHoursInvoiced", totalHoursInvoiced);
 
   return (
     <>
@@ -163,18 +177,13 @@ export default function MonthlyTimesheetPage() {
       />
       <main className={"mx-auto flex max-w-7xl flex-col p-10"}>
         <TimeSheetNav employeeId={employeeId} year={year} month={month} />
-        <ProgressBar totalHoursWorked={totalHoursWorked} totalHoursInvoiced={totalHoursInvoiced} monthlyPay={monthlyPay} />
-        <div className="bg-white bg-opacity-50 px-4 pt-8 pb-8 dark:bg-black dark:bg-opacity-10 sm:px-6 lg:px-8">
-          <div className="sm:flex sm:items-center">
-            <div className="sm:flex-auto">
-              <h1 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                Forventet lønnsomsetning - {employee?.description}
-              </h1>
-              <p className="mt-2 text-sm text-gray-700 dark:text-gray-200">
-                For arbeid utført i {monthName} {year}.
-              </p>
-            </div>
-          </div>
+        <ProgressBar
+          totalHoursWorked={totalHoursWorked}
+          totalHoursInvoiced={totalHoursInvoiced}
+          monthlyPay={monthlyPay}
+        />
+        <div className="bg-[#EBFFFD] px-4 pt-8 pb-8 dark:bg-black dark:bg-opacity-10 sm:px-6 lg:px-8 rounded-lg">
+          <div className="sm:flex sm:items-center"></div>
           <div className={"-mx-4 mt-8 flow-root sm:mx-0"}>
             <table className={"min-w-full divide-y divide-gray-300"}>
               <thead>
@@ -186,34 +195,42 @@ export default function MonthlyTimesheetPage() {
                     Prosjekt
                   </th>
                   <th
-                    scope="col"
-                    className="hidden py-3.5 px-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-500 md:table-cell"
+                    scope={"col"}
+                    className={
+                      "hidden pb-4 px-3 text-right text-sm  text-gray-900 dark:text-gray-500 md:table-cell"
+                    }
                   >
-                    Forklaring
+                    <div className={"font-semibold"}>Timer</div>
                   </th>
                   <th
                     scope={"col"}
                     className={
-                      "hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 dark:text-gray-500 md:table-cell"
+                      "hidden py-3.5 px-3 text-right text-sm  text-gray-900 dark:text-gray-500 md:table-cell"
                     }
                   >
-                    Timer
+                    <div className={"flex flex-col items-end"}>
+                      <div className={"flex flex-col items-start"}>
+                        <div className={"font-semibold"}>Rate</div>
+                        <div className={"font-normal text-xs"}>
+                          Oppgitt i NOK
+                        </div>
+                      </div>
+                    </div>
                   </th>
                   <th
                     scope={"col"}
                     className={
-                      "hidden py-3.5 px-3 text-right text-sm font-semibold text-gray-900 dark:text-gray-500 md:table-cell"
+                      "hidden py-3.5 px-3 text-right text-sm  text-gray-900 dark:text-gray-500 md:table-cell"
                     }
                   >
-                    Rate
-                  </th>
-                  <th
-                    scope={"col"}
-                    className={
-                      "dark: py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-500 sm:pr-0"
-                    }
-                  >
-                    Sum
+                    <div className={"flex flex-col items-end"}>
+                      <div className={"flex flex-col items-start"}>
+                        <div className={"font-semibold"}>Sum</div>
+                        <div className={"font-normal text-xs"}>
+                          Oppgitt i NOK
+                        </div>
+                      </div>
+                    </div>
                   </th>
                 </tr>
               </thead>
@@ -221,8 +238,7 @@ export default function MonthlyTimesheetPage() {
                 {totalByProject.length > 0 ? (
                   Object.values(totalByProject).map(
                     ({ hours, name, rate, sum, explanation, error }) => (
-                      <tr key={name}
-                          className={`border-b border-gray-300 ${error ? "bg-red-300 dark:bg-red-950 rounded" : ""}`}>
+                      <tr key={name} className={`border-b border-gray-300 `}>
                         <td className={"py-4 pl-4 pr-3 text-sm sm:pl-0"}>
                           <p
                             className={
@@ -231,63 +247,36 @@ export default function MonthlyTimesheetPage() {
                           >
                             {name}
                           </p>
-                          <p
-                            className={`mt-0.5 md:hidden text-gray-500 ${error ? "dark:text-white text-black italic pt-2 pb-2" : ""}`}>
-                            {mainProject?.name === name
-                              ? "Hovedprosjekt"
-                              : explanation
-                                ? `${explanation}`
-                                : ""}
-                            {error ? ` - OBS! ${error}` : ""}
-                          </p>
+
                           <p className={"mt-0.5 text-gray-500 md:hidden"}>
                             {Intl.NumberFormat("nb-NO", {
                               style: "decimal",
-                              maximumFractionDigits: 2
+                              maximumFractionDigits: 2,
                             }).format(hours.worked)}{" "}
                             *{" "}
                             {Intl.NumberFormat("nb-NO", {
                               style: "currency",
                               currency: "NOK",
-                              maximumFractionDigits: 2
+                              maximumFractionDigits: 2,
                             }).format(rate)}
                             <br />
                           </p>
                         </td>
-                        <td
-                          className={
-                            `hidden py-4 px-3 text-sm text-gray-500 md:table-cell ${error ? "dark:text-white text-black italic pt-2 pb-2" : ""} `
-                          }
-                        >
-                          {mainProject?.name === name
-                            ? "Hovedprosjekt"
-                            : explanation
-                              ? `${explanation}`
-                              : ""}
-                          {error ? ` - OBS! ${error}` : ""}
-                        </td>
-                        <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell">
+
+                        <td className="hidden py-4 px-3 text-center text-sm text-gray-500 md:table-cell">
                           {Intl.NumberFormat("nb-NO", {
                             style: "decimal",
-                            maximumFractionDigits: 2
+                            maximumFractionDigits: 2,
                           }).format(hours.worked)}
                         </td>
-                        <td className="hidden py-4 px-3 text-right text-sm text-gray-500 md:table-cell">
-                          {Intl.NumberFormat("nb-NO", {
-                            style: "currency",
-                            currency: "NOK",
-                            maximumFractionDigits: 2,
-                          }).format(rate)}
+                        <td className="hidden py-4 px-3 text-center text-sm text-gray-500 md:table-cell">
+                          {rate}
                         </td>
-                        <td className="py-4 pl-3 pr-4 text-right text-sm text-gray-500 sm:pr-0">
-                          {Intl.NumberFormat("nb-NO", {
-                            style: "currency",
-                            currency: "NOK",
-                            maximumFractionDigits: 2,
-                          }).format(sum.earned)}
+                        <td className="py-4 pl-3 pr-12 text-center text-sm text-gray-500 sm:pr-0">
+                          {sum.earned}
                         </td>
                       </tr>
-                    )
+                    ),
                   )
                 ) : (
                   <tr>
@@ -311,7 +300,7 @@ export default function MonthlyTimesheetPage() {
                 <tr>
                   <th
                     scope={"row"}
-                    colSpan={4}
+                    colSpan={3}
                     className={
                       "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
                     }
@@ -341,7 +330,7 @@ export default function MonthlyTimesheetPage() {
                 <tr>
                   <th
                     scope={"row"}
-                    colSpan={4}
+                    colSpan={3}
                     className={
                       "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
                     }
@@ -371,7 +360,7 @@ export default function MonthlyTimesheetPage() {
                 <tr>
                   <th
                     scope={"row"}
-                    colSpan={4}
+                    colSpan={3}
                     className={
                       "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
                     }
@@ -401,7 +390,7 @@ export default function MonthlyTimesheetPage() {
                 <tr>
                   <th
                     scope={"row"}
-                    colSpan={4}
+                    colSpan={3}
                     className={
                       "hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100 md:table-cell md:pl-0"
                     }
@@ -474,7 +463,7 @@ function StandardErrorBoundary({ error }: { error: ErrorResponse }) {
           className={"ml-2 rounded bg-gray-100 p-2 text-sm dark:bg-gray-900"}
           onClick={() => {
             navigator.clipboard.writeText(
-              JSON.stringify({ ...error, stack: error.data.stack }, null, 2)
+              JSON.stringify({ ...error, stack: error.data.stack }, null, 2),
             );
           }}
         >
@@ -482,7 +471,7 @@ function StandardErrorBoundary({ error }: { error: ErrorResponse }) {
         </button>
         <a
           href={`mailto:henry.sjoen@miles.no?subject=Error in timesheet&body=${encodeURIComponent(
-            JSON.stringify({ ...error, stack: error.data.stack }, null, 2)
+            JSON.stringify({ ...error, stack: error.data.stack }, null, 2),
           )}`}
           className={
             "ml-2 rounded bg-gray-100 p-2 text-sm dark:bg-gray-200 dark:text-gray-900"
