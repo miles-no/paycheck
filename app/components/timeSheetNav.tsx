@@ -13,14 +13,9 @@ export function TimeSheetNav(props: {
   const { employeeId, year, month } = props;
   return (
     <>
-      <p className={"mt-4 text-center font-mono text-xl capitalize"}>
-        {new Date(Number(year), Number(month) - 1).toLocaleString("nb-NO", {
-          month: "long",
-        })}{" "}
-        {year}
-      </p>
-      <nav className="hideInPrint m-4 flex">
-        <div className="flex flex-1">
+     
+      <nav className="hideInPrint m-4 flex justify-center">
+        <div>
           <a
             href={`/employees/${employeeId}/timesheets/${getPreviousMonthLink(
               year,
@@ -32,10 +27,16 @@ export function TimeSheetNav(props: {
               className="mr-3 h-5 w-5 text-gray-400"
               aria-hidden="true"
             />
-            Forrige måned
+           
           </a>
         </div>
-        <div className="hidden lg:-mt-px lg:flex">
+        <p className={"mt-4 text-center font-mono text-xl capitalize color text-[#FF303B]"}>
+        {new Date(Number(year), Number(month) - 1).toLocaleString("nb-NO", {
+          month: "long",
+        })}{" "}
+        {year}
+      </p>
+       {/*  <div className="hidden lg:-mt-px lg:flex">
           {[...Array(12).keys()].map((monthy) => (
             <a
               key={monthy}
@@ -54,8 +55,8 @@ export function TimeSheetNav(props: {
               })}
             </a>
           ))}
-        </div>
-        <div className="flex flex-1 justify-end">
+        </div> */}
+        <div>
           <a
             href={
               // one month forward
@@ -66,7 +67,7 @@ export function TimeSheetNav(props: {
             }
             className="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
           >
-            Neste måned
+          
             <ChevronRightIcon
               className="ml-3 h-5 w-5 text-gray-400"
               aria-hidden="true"

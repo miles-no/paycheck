@@ -165,6 +165,8 @@ export default function MonthlyTimesheetPage() {
   );
   console.log("totalHoursInvoiced", totalHoursInvoiced);
 
+  const isAdmin = user.role.name === ("admin" || "manager");
+
   return (
     <>
       <Navbar
@@ -190,14 +192,14 @@ export default function MonthlyTimesheetPage() {
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-0"
+                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-[#004047] sm:pl-0"
                   >
                     Prosjekt
                   </th>
                   <th
                     scope={"col"}
                     className={
-                      "hidden pb-4 px-3 text-right text-sm  text-gray-900 dark:text-gray-500 md:table-cell"
+                      "hidden pb-4 px-3 text-right text-sm  text-[#004047] md:table-cell"
                     }
                   >
                     <div className={"font-semibold"}>Timer</div>
@@ -205,13 +207,13 @@ export default function MonthlyTimesheetPage() {
                   <th
                     scope={"col"}
                     className={
-                      "hidden py-3.5 px-3 text-right text-sm  text-gray-900 dark:text-gray-500 md:table-cell"
+                      "hidden py-3.5 px-3 text-right text-sm  text-[#004047] md:table-cell"
                     }
                   >
                     <div className={"flex flex-col items-end"}>
-                      <div className={"flex flex-col items-start"}>
+                      <div className={"flex flex-col items-start "}>
                         <div className={"font-semibold"}>Rate</div>
-                        <div className={"font-normal text-xs"}>
+                        <div className={"font-normal text-xs whitespace-nowrap"}>
                           Oppgitt i NOK
                         </div>
                       </div>
@@ -220,13 +222,13 @@ export default function MonthlyTimesheetPage() {
                   <th
                     scope={"col"}
                     className={
-                      "hidden py-3.5 px-3 text-right text-sm  text-gray-900 dark:text-gray-500 md:table-cell"
+                      "py-3.5 px-3 text-right text-sm  text-[#004047] md:table-cell"
                     }
                   >
                     <div className={"flex flex-col items-end"}>
-                      <div className={"flex flex-col items-start"}>
+                      <div className={"flex flex-col lg:items-start items-center"}>
                         <div className={"font-semibold"}>Sum</div>
-                        <div className={"font-normal text-xs"}>
+                        <div className={"font-normal text-xs whitespace-nowrap"}>
                           Oppgitt i NOK
                         </div>
                       </div>
@@ -296,138 +298,154 @@ export default function MonthlyTimesheetPage() {
                   </tr>
                 )}
               </tbody>
-              <tfoot>
-                <tr>
-                  <th
-                    scope={"row"}
-                    colSpan={3}
-                    className={
-                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
-                    }
-                  >
-                    Subtotal
-                  </th>
-                  <th
-                    scope={"row"}
-                    className={
-                      "pl-6 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:hidden"
-                    }
-                  >
-                    Subtotal
-                  </th>
-                  <td
-                    className={
-                      "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
-                    }
-                  >
-                    {Intl.NumberFormat("nb-NO", {
-                      style: "currency",
-                      currency: "NOK",
-                      maximumFractionDigits: 2,
-                    }).format(monthlyPay.invoicedAmount)}
-                  </td>
-                </tr>
-                <tr>
-                  <th
-                    scope={"row"}
-                    colSpan={3}
-                    className={
-                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
-                    }
-                  >
-                    Provisjon
-                  </th>
-                  <th
-                    scope={"row"}
-                    className={
-                      "pl-6 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:hidden"
-                    }
-                  >
-                    Provisjon
-                  </th>
-                  <td
-                    className={
-                      "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
-                    }
-                  >
-                    {Intl.NumberFormat("nb-NO", {
-                      style: "currency",
-                      currency: "NOK",
-                      maximumFractionDigits: 2,
-                    }).format(monthlyPay.provision)}
-                  </td>
-                </tr>
-                <tr>
-                  <th
-                    scope={"row"}
-                    colSpan={3}
-                    className={
-                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 md:table-cell md:pl-0"
-                    }
-                  >
-                    Fastlønn
-                  </th>
-                  <th
-                    scope={"row"}
-                    className={
-                      "pl-6 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:hidden"
-                    }
-                  >
-                    Fastlønn
-                  </th>
-                  <td
-                    className={
-                      "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
-                    }
-                  >
-                    {Intl.NumberFormat("nb-NO", {
-                      style: "currency",
-                      currency: "NOK",
-                      maximumFractionDigits: 2,
-                    }).format(monthlyPay.fixedSalary)}
-                  </td>
-                </tr>
-                <tr>
-                  <th
-                    scope={"row"}
-                    colSpan={3}
-                    className={
-                      "hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100 md:table-cell md:pl-0"
-                    }
-                  >
-                    Totalt
-                  </th>
-                  <th
-                    scope={"row"}
-                    className={
-                      "pl-6 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 md:hidden"
-                    }
-                  >
-                    Totalt
-                  </th>
-                  <td
-                    className={
-                      "pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100 md:pr-0"
-                    }
-                  >
-                    {Intl.NumberFormat("nb-NO", {
-                      style: "currency",
-                      currency: "NOK",
-                      maximumFractionDigits: 2,
-                    }).format(monthlyPay.pay)}
-                  </td>
-                </tr>
-              </tfoot>
             </table>
+            <div className={"flex flex-col  mr-10 lg:items-end"}>
+              <div className={"flex flex-row lg:w-1/4 justify-between"}>
+                <div
+                  className={
+                    " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0"
+                  }
+                >
+                  Fakturerbare timer
+                </div>
+
+                <div
+                  className={
+                    "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                  }
+                >
+                  {monthlyPay.invoicedAmount}
+                </div>
+              </div>
+
+              <div className={"border-b  border-gray-300 flex flex-row  lg:w-1/4 justify-between"}>
+                <div
+                  className={
+                    " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0 "
+                  }
+                >
+                  Selvkost
+                </div>
+
+                <div
+                  className={
+                    "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0 "
+                  }
+                >
+                  -{monthlyPay.invoicedAmount}
+                </div>
+              </div>
+
+              <div className={"flex flex-row lg:w-1/4 justify-between"}>
+                <div
+                  className={
+                    " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0 divide-y"
+                  }
+                >
+                  Beløp over selvkost
+                </div>
+
+                <div
+                  className={
+                    "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                  }
+                >
+                  {monthlyPay.invoicedAmount}
+                </div>
+              </div>
+
+              <div className={"flex flex-row lg:w-1/4 justify-between"}>
+                <div
+                  className={
+                    " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0"
+                  }
+                >
+                  Provisjon
+                </div>
+
+                <div
+                  className={
+                    "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                  }
+                >
+                  {monthlyPay.provision}
+                </div>
+              </div>
+
+              <div className={"border-b  border-gray-300 flex flex-row  lg:w-1/4 justify-between"}>
+                <div
+                  className={
+                    " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0"
+                  }
+                >
+                  Fastlønn
+                </div>
+
+                <div
+                  className={
+                    "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                  }
+                >
+                  {monthlyPay.fixedSalary}
+                </div>
+              </div>
+
+              <div className={"flex flex-row lg:w-1/4 justify-between"}>
+                <div
+                  className={
+                    " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0"
+                  }
+                >
+                  Subtotal
+                </div>
+
+                <div
+                  className={
+                    "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
+                  }
+                >
+                  {monthlyPay.invoicedAmount}
+                </div>
+              </div>
+             
+            </div>
+            <div>
+            <div
+                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-0"
+                  >
+                    Andre aktiviteter
+                  </div>
+                  <div className={"flex flex-row lg:w-1/4 justify-between"}>
+                <div
+                  className={
+                    " pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 md:table-cell md:pl-0"
+                  }
+                >
+                  Totalt
+                </div>
+
+                <div
+                  className={
+                    "pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100 md:pr-0"
+                  }
+                >
+                  {monthlyPay.pay}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mt-6 flex justify-end">
-            <a
-              href={`/employees/${employeeId}`}
-              className={"text-sm text-gray-500"}
-            >
-              Endre variabler
-            </a>
-          </div>
+          {isAdmin ? (
+            <div className="mt-6 flex justify-end">
+              <a
+                href={`/employees/${employeeId}`}
+                className={"text-sm text-gray-500"}
+              >
+                Endre variabler
+              </a>
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
         <Form
           method="post"
@@ -438,7 +456,7 @@ export default function MonthlyTimesheetPage() {
             type="submit"
           >
             <ArrowPathIcon className={"h-6 w-6"} />
-            <p>Force refresh</p>
+            <p>Hent inn på nytt</p>
           </button>
         </Form>
       </main>
