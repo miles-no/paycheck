@@ -199,7 +199,7 @@ export default function MonthlyTimesheetPage() {
                   <th
                     scope={"col"}
                     className={
-                      "hidden pb-4 px-3 text-right text-sm  text-[#004047] md:table-cell"
+                      "hidden pb-4 px-3  text-sm  text-[#004047] md:table-cell"
                     }
                   >
                     <div className={"font-semibold"}>Timer</div>
@@ -207,13 +207,15 @@ export default function MonthlyTimesheetPage() {
                   <th
                     scope={"col"}
                     className={
-                      "hidden py-3.5 px-3 text-right text-sm  text-[#004047] md:table-cell"
+                      "hidden py-3.5 px-3  text-sm  text-[#004047] md:table-cell"
                     }
                   >
-                    <div className={"flex flex-col items-end"}>
+                    <div className={"flex flex-col items-center"}>
                       <div className={"flex flex-col items-start "}>
                         <div className={"font-semibold"}>Rate</div>
-                        <div className={"font-normal text-xs whitespace-nowrap"}>
+                        <div
+                          className={"font-normal text-xs whitespace-nowrap"}
+                        >
                           Oppgitt i NOK
                         </div>
                       </div>
@@ -225,10 +227,14 @@ export default function MonthlyTimesheetPage() {
                       "py-3.5 px-3 text-right text-sm  text-[#004047] md:table-cell"
                     }
                   >
-                    <div className={"flex flex-col items-end"}>
-                      <div className={"flex flex-col lg:items-start items-center"}>
+                    <div className={"flex flex-col items-center"}>
+                      <div
+                        className={"flex flex-col lg:items-start items-center"}
+                      >
                         <div className={"font-semibold"}>Sum</div>
-                        <div className={"font-normal text-xs whitespace-nowrap"}>
+                        <div
+                          className={"font-normal text-xs whitespace-nowrap"}
+                        >
                           Oppgitt i NOK
                         </div>
                       </div>
@@ -318,7 +324,11 @@ export default function MonthlyTimesheetPage() {
                 </div>
               </div>
 
-              <div className={"border-b  border-gray-300 flex flex-row  lg:w-1/4 justify-between"}>
+              <div
+                className={
+                  "border-b  border-gray-300 flex flex-row  lg:w-1/4 justify-between"
+                }
+              >
                 <div
                   className={
                     " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0 "
@@ -372,7 +382,11 @@ export default function MonthlyTimesheetPage() {
                 </div>
               </div>
 
-              <div className={"border-b  border-gray-300 flex flex-row  lg:w-1/4 justify-between"}>
+              <div
+                className={
+                  "border-b  border-gray-300 flex flex-row  lg:w-1/4 justify-between"
+                }
+              >
                 <div
                   className={
                     " pl-4 pr-3 pt-4 text-left text-sm font-normal text-gray-500 md:table-cell md:pl-0"
@@ -407,29 +421,28 @@ export default function MonthlyTimesheetPage() {
                   {monthlyPay.invoicedAmount}
                 </div>
               </div>
-             
             </div>
             <div>
-            <div
-                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-0"
+              <div className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-0">
+                Andre aktiviteter
+              </div>
+              <div className ="flex flex-col  mr-10 lg:items-end" >
+                <div className={"flex flex-row lg:w-1/4 justify-between"}>
+                  <div
+                    className={
+                      " pl-4 pr-3 pt-4 text-left text-sm font-semibold text-[##004047] md:table-cell md:pl-0"
+                    }
                   >
-                    Andre aktiviteter
+                    Totalt
                   </div>
-                  <div className={"flex flex-row lg:w-1/4 justify-between"}>
-                <div
-                  className={
-                    " pl-4 pr-3 pt-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 md:table-cell md:pl-0"
-                  }
-                >
-                  Totalt
-                </div>
 
-                <div
-                  className={
-                    "pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 dark:text-gray-100 md:pr-0"
-                  }
-                >
-                  {monthlyPay.pay}
+                  <div
+                    className={
+                      "pl-3 pr-4 pt-4 text-right text-sm font-semibold text-[##004047] md:pr-0"
+                    }
+                  >
+                    {monthlyPay.pay}
+                  </div>
                 </div>
               </div>
             </div>
