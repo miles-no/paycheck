@@ -151,22 +151,18 @@ export default function MonthlyTimesheetPage() {
     "nb-NO",
     { month: "long" },
   );
-  console.log("asdf", totalByProject);
 
   const totalHoursWorked = Object.values(totalByProject || {}).reduce(
     (acc, cur) => acc + cur.hours.worked,
     0,
   );
-  console.log("totalHoursWorked", totalHoursWorked);
 
   const totalHoursInvoiced = Object.values(totalByProject || {}).reduce(
     (acc, cur) => acc + cur.hours.invoiced,
     0,
   );
-  console.log("totalHoursInvoiced", totalHoursInvoiced);
-
   const isAdmin = user.role.name === ("admin" || "manager");
-
+  const maxValue = 172.5;
   return (
     <>
       <Navbar
@@ -183,6 +179,7 @@ export default function MonthlyTimesheetPage() {
           totalHoursWorked={totalHoursWorked}
           totalHoursInvoiced={totalHoursInvoiced}
           monthlyPay={monthlyPay}
+          maxValue = {maxValue}
         />
         <div className="bg-[#EBFFFD] px-4 pt-8 pb-8 dark:bg-black dark:bg-opacity-10 sm:px-6 lg:px-8 rounded-lg">
           <div className="sm:flex sm:items-center"></div>

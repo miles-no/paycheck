@@ -6,26 +6,26 @@ export function ProgressBar(props: {
   totalHoursWorked: number;
   totalHoursInvoiced: number;
   monthlyPay: object;
+  maxValue: number;
 }) {
-  const { totalHoursWorked, totalHoursInvoiced, monthlyPay } = props;
-  const maxHours = 172.5;
+  const { totalHoursWorked, totalHoursInvoiced, monthlyPay, maxValue } = props;
+  const maxHours = maxValue;
   const percentage =
     ((totalHoursInvoiced != null ? totalHoursInvoiced : 1) / maxHours) * 100;
   const percentageProgress =
     ((totalHoursWorked != null ? totalHoursWorked : 1) / maxHours) * 100;
   const pay = (monthlyPay as { pay?: number }).pay;
 
-  console.log(percentage, percentageProgress, "asdf");
 
   // fix css positioning of the progress bar, lage fill last klasse ? 
   return (
-    <div>
-      <div className="flex flex-row justify-between text-white">
+    <div className={"w-full h-24"}>
+      <div className="flex flex-row justify-between text-white ">
         <div>
           <p className="flex flex-row whitespace-nowrap">
             Du har ført &nbsp;{" "}
             <div className="text-[#78E8DB] ">{totalHoursInvoiced} </div> &nbsp;
-            av 172,5 timer denne måneden
+            av {maxHours} timer denne måneden
           </p>
         </div>
         <div>

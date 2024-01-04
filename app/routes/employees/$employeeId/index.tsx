@@ -89,6 +89,8 @@ export async function getXledgerEmployeeData(employeeId: string) {
   return json;
 }
 
+
+
 export async function loader({ params, context, request }: LoaderArgs) {
   const { employeeId } = params;
 
@@ -212,7 +214,7 @@ export default function EmployeeEditPage() {
         />
         <XledgerEmail
           employee={{
-            XledgerEmail: `${employee?.XledgerEmail}`,
+            XledgerEmail: `${employee?.email}`,
           }}
         />
 
@@ -280,7 +282,7 @@ export function RoleSection(props: { role?: string }) {
   return (
     <div className="md:grid md:grid-cols-2 md:gap-6 w-full">
       <div className="mt-5 md:col-span-2 md:mt-0">
-        <div className="overflow-hidden shadow sm:rounded-md">
+        <div className="overflow-hidden shadow rounded-md">
           <div className="bg-[#EBFFFD] bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*NAVN*/}
@@ -293,7 +295,7 @@ export function RoleSection(props: { role?: string }) {
                         "text-xl capitalize text-gray-900 dark:text-gray-100"
                       }
                     >
-                      {role === Role.employee ? "Ansatt" : role}
+                      {role === Role.employee || Role.Employee ? "Ansatt" : role}
                     </p>
                   </label>
                 </Form>
@@ -310,7 +312,7 @@ export function EmployeeNumber(props: { code: string }) {
   return (
     <div className="md:grid md:grid-cols-2 md:gap-6  w-full">
       <div className="mt-5 md:col-span-2 md:mt-0">
-        <div className="overflow-hidden shadow sm:rounded-md">
+        <div className="overflow-hidden shadow rounded-md">
           <div className="bg-[#EBFFFD] bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*ansatt nummer*/}
@@ -350,7 +352,7 @@ export function XledgerId(props: {
   return (
     <div className="md:grid md:grid-cols-2 md:gap-6  w-full">
       <div className="mt-5 md:col-span-2 md:mt-0">
-        <div className="overflow-hidden shadow sm:rounded-md">
+        <div className="overflow-hidden shadow rounded-md">
           <div className="bg-[#EBFFFD] bg-opacity-90 px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*xledgerid*/}
@@ -380,10 +382,10 @@ export function XledgerEmail(props: {
 }) {
   const { employee } = props;
   return (
-    <div className="w-9/12 h-full items-stretch overflow-hidden shadow sm:rounded-md">
-          <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6 h-full">
+    <div className="lg:w-9/12 h-full items-stretch overflow-hidden shadow rounded-md">
+          <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6 lg:h-full">
               {/*XledgerEmail*/}
-                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100 my-24   justify-center">
+                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100 lg:my-24  lg:justify-center">
                   Epost
                   <p
                     className={
@@ -411,7 +413,7 @@ export function XledgerInfoSection(props: {
   return (
     <div className="md:grid md:grid-cols-3 md:gap-6">
       <div className="mt-5 md:col-span-2 md:mt-0">
-        <div className="overflow-hidden shadow sm:rounded-md">
+        <div className="overflow-hidden shadow rounded-md">
           <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6">
             <div className="grid grid-cols-6 gap-6">
               {/*NAVN*/}
@@ -491,7 +493,7 @@ export function XledgerInfoSection(props: {
 }
 
 export function Divider() {
-  return <div className="py-5 sm:py-10" aria-hidden="true"></div>;
+  return <div className="py-5 lg:py-10" aria-hidden="true"></div>;
 }
 
 export function ExtraVariablesSection(props: {
@@ -517,7 +519,7 @@ export function ExtraVariablesSection(props: {
             name={"xledgerId"}
           />
 
-          <div className="overflow-hidden shadow sm:rounded-md w-full">
+          <div className="overflow-hidden shadow rounded-md w-full">
             <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="col-span-6 sm:col-span-3">

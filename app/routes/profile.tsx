@@ -60,13 +60,13 @@ export default function Dashboard() {
         <h1 className={"text-2xl font-bold"}>Hei {user?.name}!</h1>
 
         <Divider />
-        <div className="flex flex-row justify-between gap-8">
+        <div className="flex lg:flex-row flex-col justify-between gap-8">
           <RoleSection role={user?.role.name} />
           <EmployeeNumber code={employee?.code} />
           <XledgerId employee={{ xledgerId: employee.xledgerId || "" }} />
         </div>
         <Divider />
-        <div className="flex flex-row justify-between gap-8 items-stretch h-full">
+        <div className="flex lg:flex-row flex-col justify-between gap-8 items-stretch h-full">
           <XledgerEmail employee={{ XledgerEmail: employee.email || "" }} />
           <ExtraVariablesSection
             employee={{

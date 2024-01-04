@@ -1,6 +1,16 @@
 import type { Employee } from "~/services/getEmployees.server";
 import { randEmail, randFullName, randJobTitle } from "@ngneat/falso";
 
+const randomNumber10to37 = () => Math.floor(Math.random() * 28) + 10;
+const randomNumber10000to99999 = () => Math.floor(Math.random() * 89999) + 10000;
+
+const teamLeaders = [
+  "Hildegunn",
+  "Daniel",
+  "Kurt",
+]
+
+const randomTeam = () => teamLeaders[Math.floor(Math.random() * teamLeaders.length)];
 export const mockedEmployees: Employee[] = Array.from({ length: 51 }, (_, i) =>
   i === 50 ? { // Add a test user for mocking the logged-in user
     description: "Test Testesen",
@@ -13,7 +23,13 @@ export const mockedEmployees: Employee[] = Array.from({ length: 51 }, (_, i) =>
     code: `${i + 1}`,
     dbId: i + 1,
     email: randEmail(),
-    positionValue: { description: randJobTitle() }
+    positionValue: { description: randJobTitle() },
+    hoursWorked: randomNumber10to37(),
+    invoicedAmount: randomNumber10000to99999(),
+    invoicedHours: randomNumber10to37(),
+    nonInvoicableHours: randomNumber10to37(),
+    teamLeader: randomTeam(),
+
   });
 
 export const mockedTimesheets = {
