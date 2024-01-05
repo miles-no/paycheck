@@ -49,6 +49,9 @@ export default function IndexPage() {
   console.log("asdf", sortedEmployees);
 
   const calcRemaining = (hoursWorked: number) => {
+    if (!hoursWorked ) {
+      return 172.5;
+    }
     const remaining = 172.5 - hoursWorked;
     return remaining;
   };
@@ -148,7 +151,7 @@ export default function IndexPage() {
                   {employee.teamLeader}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
-                  <p> {employee.hoursWorked} timer</p>
+                  <p> {employee.hoursWorked ?  employee.hoursWorked : 0} timer</p>
                   <p className="font-light pt-2 text-sm">
                     {calcRemaining(employee.hoursWorked)} timer igjen
                   </p>
