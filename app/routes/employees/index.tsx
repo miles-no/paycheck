@@ -9,6 +9,7 @@ import { ProgressBar } from "~/components/progressBar";
 import React, { useState } from "react";
 import UpOrDown from "~/assets/UpOrDown";
 import { TimeSheetNav } from "~/components/timeSheetNav";
+import SomeoneHasBeenBad from "~/assets/SomeoneHasBeenBad";
 
 export async function loader({ params, context, request }: LoaderArgs) {
   const user = await requireAdminOrManager(request);
@@ -44,7 +45,19 @@ export default function IndexPage() {
   const years = "2024";
   const employeeId = "1";
   const months = "1";
+  const someNumber = 10000;
   console.log("asdf", sortedEmployees);
+
+  const calcRemaining = (hoursWorked: number) => {
+    const remaining = 172.5 - hoursWorked;
+    return remaining;
+  };
+  const hasSomeoneBeenBad = (invoicedAmount: number) => {
+    if (invoicedAmount < 20000) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <div>
@@ -83,7 +96,7 @@ export default function IndexPage() {
         </div>
         <table>
           <tr className="flex flex-row justify-between text-white mt-8 items-center p-8">
-            <th className="w-56 ml-12">
+            <th className="w-60 ml-12">
               <button
                 onClick={() => sortEmployeesBothWays(employees)}
                 className="flex flex-row gap-2 items-center "
@@ -119,12 +132,13 @@ export default function IndexPage() {
               Fakturerbart <br /> beløp (I kr){" "}
             </th>
           </tr>
-            {sortedEmployees.map((employee: any) => (
-              <a
+          {sortedEmployees.map((employee: any) => (
+            <a
               href={`/employees/${employee.dbId}/timesheets/${year}/${month}`}
-              key={employee.dbId}>
-          <tr className="flex  justify-between items-center mt-8  w-full  bg-[#EBFFFD] shadow dark:border dark:border-gray-500 dark:bg-black dark:bg-opacity-40 sm:rounded-lg p-8">
-                <td className="text-lg font-medium leading-6 text-black dark:text-white w-56">
+              key={employee.dbId}
+            >
+              <tr className="flex  justify-between items-center mt-8  w-full  bg-[#EBFFFD] shadow dark:border dark:border-gray-500 dark:bg-black dark:bg-opacity-40 sm:rounded-lg p-8">
+                <td className="text-lg font-medium leading-6 text-black dark:text-white w-60">
                   {employee.description}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 hidden xl:block">
@@ -134,7 +148,10 @@ export default function IndexPage() {
                   {employee.teamLeader}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
-                  {employee.hoursWorked}
+                  <p> {employee.hoursWorked} timer</p>
+                  <p className="font-light pt-2 text-sm">
+                    {calcRemaining(employee.hoursWorked)} timer igjen
+                  </p>
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
                   {employee.nonInvoicableHours}
@@ -143,12 +160,17 @@ export default function IndexPage() {
                   {employee.invoicedHours}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26">
-                  {employee.invoicedAmount}
+                  <div className="flex gap-2">
+                    {" "}
+                    {employee.invoicedAmount}
+                    {hasSomeoneBeenBad(employee.invoicedAmount) === true ? (
+                      <SomeoneHasBeenBad />
+                    ) : null}
+                  </div>
                 </td>
-             
-          </tr>
-          </a>
-            ))}
+              </tr>
+            </a>
+          ))}
         </table>
       </main>
     </div>
