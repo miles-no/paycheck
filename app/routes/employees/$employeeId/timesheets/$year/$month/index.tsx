@@ -180,6 +180,7 @@ export default function MonthlyTimesheetPage() {
           totalHoursInvoiced={totalHoursInvoiced}
           monthlyPay={monthlyPay}
           maxValue = {maxValue}
+          isAdmin={false}
         />
         <div className="bg-[#EBFFFD] px-4 pt-8 pb-8 dark:bg-black dark:bg-opacity-10 sm:px-6 lg:px-8 rounded-lg">
           <div className="sm:flex sm:items-center"></div>

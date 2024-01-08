@@ -24,7 +24,7 @@ export const mockedEmployees: Employee[] = Array.from({ length: 51 }, (_, i) =>
     dbId: i + 1,
     email: randEmail(),
     positionValue: { description: randJobTitle() },
-    hoursWorked: randomNumber10to37(),
+    hoursWorked: randomNumber10to37()+ 5,
     invoicedAmount: randomNumber10000to99999(),
     invoicedHours: randomNumber10to37(),
     nonInvoicableHours: randomNumber10to37(),

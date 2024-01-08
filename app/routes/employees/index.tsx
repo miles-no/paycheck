@@ -36,31 +36,67 @@ export default function IndexPage() {
     });
     setSortedEmployees(sorted);
   };
-  const totalHoursWorked = 10000;
-  const totalHoursInvoiced = 900;
-  const monthlyPay = {
-    pay: 10000,
-  };
-  const maxValue = 10572.5;
+
   const years = "2024";
   const employeeId = "1";
   const months = "1";
   const someNumber = 10000;
-  console.log("asdf", sortedEmployees);
 
   const calcRemaining = (hoursWorked: number) => {
-    if (!hoursWorked ) {
+    if (!hoursWorked) {
       return 172.5;
     }
     const remaining = 172.5 - hoursWorked;
     return remaining;
   };
   const hasSomeoneBeenBad = (invoicedAmount: number) => {
-    if (invoicedAmount < 20000) {
+    if (invoicedAmount < someNumber) {
       return true;
     }
     return false;
   };
+
+  const calcAllHoursWorked = (employees: any) => {
+    let total = 0;
+    employees.forEach((employee: any) => {
+      total += employee?.hoursWorked ? employee.hoursWorked : 0;
+    });
+    return total;
+  };
+
+  const calcAllHoursInvoiced = (employees: any) => {
+    let total = 0;
+    employees.forEach((employee: any) => {
+      total += employee?.invoicedHours ? employee.invoicedHours : 0;
+    });
+    return total;
+  };
+
+  const calcHowManyHoursShouldBeInvoiced = (employees: any) => {
+    let total = 0;
+    employees.forEach((employee: any) => {
+      total += 172.5;
+    });
+    return total;
+  };
+
+  const calcInvoicedtotal = (employees: any) => {
+    let total = 0;
+    employees.forEach((employee: any) => {
+      total += employee?.invoicedAmount ? employee.invoicedAmount : 0;
+    });
+    return total;
+  };
+  const monthlyPay = {
+    pay: calcInvoicedtotal(employees),
+  };
+
+  const totalHoursWorked = calcAllHoursWorked(employees);
+
+  const maxValue = calcHowManyHoursShouldBeInvoiced(employees);
+
+  const totalHoursInvoiced = calcAllHoursInvoiced(employees);
+  const invoicingRate = (totalHoursInvoiced / totalHoursWorked) * 100;
 
   return (
     <div>
@@ -87,7 +123,13 @@ export default function IndexPage() {
               totalHoursInvoiced={totalHoursInvoiced}
               monthlyPay={monthlyPay}
               maxValue={maxValue}
+              isAdmin={true}
             />
+            <div className="w-full -mt-8">
+              <h3 className="text-white ">
+                Faktureringsgrad {invoicingRate.toFixed(0)} %{" "}
+              </h3>
+            </div>
             <div className="sm:flex-auto flex justify-end">
               <p className={"mt-2 text-sm text-white"}>
                 <a href="/report" target="_blank" rel="noopener noreferrer">
@@ -151,7 +193,10 @@ export default function IndexPage() {
                   {employee.teamLeader}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
-                  <p> {employee.hoursWorked ?  employee.hoursWorked : 0} timer</p>
+                  <p>
+                    {" "}
+                    {employee.hoursWorked ? employee.hoursWorked : 0} timer
+                  </p>
                   <p className="font-light pt-2 text-sm">
                     {calcRemaining(employee.hoursWorked)} timer igjen
                   </p>
@@ -165,7 +210,9 @@ export default function IndexPage() {
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26">
                   <div className="flex gap-2">
                     {" "}
-                    {employee.invoicedAmount}
+                    {employee?.invoicedAmount
+                      ? employee?.invoicedAmount.toLocaleString("nb-NO")
+                      : 0}
                     {hasSomeoneBeenBad(employee.invoicedAmount) === true ? (
                       <SomeoneHasBeenBad />
                     ) : null}
