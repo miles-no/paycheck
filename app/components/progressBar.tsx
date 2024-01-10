@@ -22,8 +22,7 @@ export function ProgressBar(props: {
   const percentageProgress =
     ((totalHoursWorked != null ? totalHoursWorked : 1) / maxHours) * 100;
   const pay = (monthlyPay as { pay?: number }).pay;
- 
- 
+
   return (
     <div className={"w-full h-24"}>
       <div className="flex flex-row justify-between text-white ">
@@ -56,7 +55,7 @@ export function ProgressBar(props: {
           className="progress-bar__fillfirst"
           style={{ width: `${percentageProgress}%` }}
         >
-          <p className ="overflow-hidden">Sendt til godkjenning</p>
+          <p className="overflow-hidden">Sendt til godkjenning</p>
 
           <div className="pl-1 pr-6 ">
             <SentToApproval />
@@ -79,7 +78,6 @@ export function ProgressBar(props: {
           </div>
         </div>
       </div>
-   
     </div>
   );
 }

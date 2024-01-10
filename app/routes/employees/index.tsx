@@ -184,28 +184,28 @@ export default function IndexPage() {
             >
               <tr className="flex  justify-between items-center mt-8  w-full  bg-[#EBFFFD] shadow dark:border dark:border-gray-500 dark:bg-black dark:bg-opacity-40 sm:rounded-lg p-8">
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-60">
-                  {employee.description}
+                  {employee?.description}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 hidden xl:block">
-                  {employee.code}
+                  {employee?.code}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
-                  {employee.teamLeader}
+                  {employee?.teamLeader}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
                   <p>
                     {" "}
-                    {employee.hoursWorked ? employee.hoursWorked : 0} timer
+                    {employee?.hoursWorked ? employee.hoursWorked : 0} timer
                   </p>
                   <p className="font-light pt-2 text-sm">
-                    {calcRemaining(employee.hoursWorked)} timer igjen
+                    {calcRemaining(employee?.hoursWorked)} timer igjen
                   </p>
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
-                  {employee.nonInvoicableHours}
+                  {employee?.nonInvoicableHours}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26 xl:block hidden">
-                  {employee.invoicedHours}
+                  {employee?.invoicedHours}
                 </td>
                 <td className="text-lg font-medium leading-6 text-black dark:text-white w-26">
                   <div className="flex gap-2">
@@ -213,7 +213,7 @@ export default function IndexPage() {
                     {employee?.invoicedAmount
                       ? employee?.invoicedAmount.toLocaleString("nb-NO")
                       : 0}
-                    {hasSomeoneBeenBad(employee.invoicedAmount) === true ? (
+                    {hasSomeoneBeenBad(employee?.invoicedAmount) === true ? (
                       <SomeoneHasBeenBad />
                     ) : null}
                   </div>

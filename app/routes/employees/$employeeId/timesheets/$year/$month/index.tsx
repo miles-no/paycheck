@@ -260,11 +260,7 @@ export default function MonthlyTimesheetPage() {
                               maximumFractionDigits: 2,
                             }).format(hours.worked)}{" "}
                             *{" "}
-                            {Intl.NumberFormat("nb-NO", {
-                              style: "currency",
-                              currency: "NOK",
-                              maximumFractionDigits: 2,
-                            }).format(rate)}
+                            {rate?.toLocaleString("nb-NO")}
                             <br />
                           </p>
                         </td>
@@ -276,10 +272,10 @@ export default function MonthlyTimesheetPage() {
                           }).format(hours.worked)}
                         </td>
                         <td className="hidden py-4 px-3 text-center text-sm text-gray-500 md:table-cell">
-                          {rate}
+                          {rate?.toLocaleString("nb-NO")}
                         </td>
                         <td className="py-4 pl-3 pr-12 text-center text-sm text-gray-500 sm:pr-0">
-                          {sum.earned}
+                          {sum?.earned.toLocaleString("nb-NO")}
                         </td>
                       </tr>
                     ),
@@ -318,7 +314,7 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
                   }
                 >
-                  {monthlyPay.invoicedAmount}
+                  {monthlyPay?.invoicedAmount.toLocaleString("nb-NO")}
                 </div>
               </div>
 
@@ -340,7 +336,7 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0 "
                   }
                 >
-                  -{monthlyPay.invoicedAmount}
+                  -{monthlyPay?.invoicedAmount.toLocaleString("nb-NO")}
                 </div>
               </div>
 
@@ -358,7 +354,7 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
                   }
                 >
-                  {monthlyPay.invoicedAmount}
+                  {monthlyPay?.invoicedAmount.toLocaleString("nb-NO")}
                 </div>
               </div>
 
@@ -376,7 +372,7 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
                   }
                 >
-                  {monthlyPay.provision}
+                  {monthlyPay?.provision.toLocaleString("nb-NO")}
                 </div>
               </div>
 
@@ -398,7 +394,7 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
                   }
                 >
-                  {monthlyPay.fixedSalary}
+                  {monthlyPay?.fixedSalary.toLocaleString("nb-NO")}
                 </div>
               </div>
 
@@ -416,7 +412,7 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
                   }
                 >
-                  {monthlyPay.invoicedAmount}
+                  {monthlyPay?.invoicedAmount.toLocaleString("nb-NO")}
                 </div>
               </div>
             </div>
@@ -439,7 +435,7 @@ export default function MonthlyTimesheetPage() {
                       "pl-3 pr-4 pt-4 text-right text-sm font-semibold text-[##004047] md:pr-0"
                     }
                   >
-                    {monthlyPay.pay}
+                    {monthlyPay?.pay.toLocaleString("nb-NO")}
                   </div>
                 </div>
               </div>
