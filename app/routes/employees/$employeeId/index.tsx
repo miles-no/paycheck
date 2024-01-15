@@ -30,7 +30,6 @@ import {
 } from "~/services/user.server";
 import { isAdminOrManager } from "~/utils/isAdminOrManager";
 
-
 interface xledgerEmployeeResponse {
   data: {
     payrollRates: {
@@ -88,8 +87,6 @@ export async function getXledgerEmployeeData(employeeId: string) {
 
   return json;
 }
-
-
 
 export async function loader({ params, context, request }: LoaderArgs) {
   const { employeeId } = params;
@@ -295,7 +292,9 @@ export function RoleSection(props: { role?: string }) {
                         "text-xl capitalize text-gray-900 dark:text-gray-100"
                       }
                     >
-                      {role === Role.employee || Role.Employee ? "Ansatt" : role}
+                      {role === Role.employee || Role.Employee
+                        ? "Ansatt"
+                        : role}
                     </p>
                   </label>
                 </Form>
@@ -383,19 +382,15 @@ export function XledgerEmail(props: {
   const { employee } = props;
   return (
     <div className="lg:w-9/12 h-full items-stretch overflow-hidden shadow rounded-md">
-          <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6 lg:h-full">
-              {/*XledgerEmail*/}
-                <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100 lg:my-24  lg:justify-center">
-                  Epost
-                  <p
-                    className={
-                      "hashStyle text-xl text-gray-900 dark:text-gray-100"
-                    }
-                  >
-                    {employee?.XledgerEmail}
-                  </p>
-                </label>
-          </div>
+      <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6 lg:h-full">
+        {/*XledgerEmail*/}
+        <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100 lg:my-24  lg:justify-center">
+          Epost
+          <p className={"hashStyle text-xl text-gray-900 dark:text-gray-100"}>
+            {employee?.XledgerEmail}
+          </p>
+        </label>
+      </div>
     </div>
   );
 }
@@ -493,7 +488,7 @@ export function XledgerInfoSection(props: {
 }
 
 export function Divider() {
-  return <div className="py-5 lg:py-10" aria-hidden="true"></div>;
+  return <div className="py-5 :py-10" aria-hidden="true"></div>;
 }
 
 export function ExtraVariablesSection(props: {
@@ -507,9 +502,10 @@ export function ExtraVariablesSection(props: {
   isSubmitting: boolean;
 }) {
   const { employee, isSubmitting, disabled } = props;
+  console.log("asdf", disabled)
   return (
-    <div className ="w-full">
-      <div className="mt-5 md:col-span-2 md:mt-0 w-full">
+    <div className="w-full bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6 rounded-md shadow">
+      <div className="mt-5 md:col-span-2 md:mt-0 w-full ">
         <Form method={"post"}>
           <input
             type="text"
@@ -519,8 +515,8 @@ export function ExtraVariablesSection(props: {
             name={"xledgerId"}
           />
 
-          <div className="overflow-hidden shadow rounded-md w-full">
-            <div className="bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6">
+          <div className="overflow-hidden  w-full">
+            <div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="col-span-6 sm:col-span-3">
                   <div className="flex whitespace-nowrap items-center justify-between">
@@ -638,12 +634,12 @@ export function ExtraVariablesSection(props: {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 px-4 py-3 text-right dark:bg-gray-300 dark:bg-opacity-10 sm:px-6">
-              {disabled ? (
+            {!disabled ? (
+              <div className="bg-gray-50 px-4 py-3 text-right dark:bg-gray-300 dark:bg-opacity-10 sm:px-6">
                 <p className="p-4 text-right text-sm font-light italic text-gray-500 dark:text-gray-400">
                   Kun en administrator kan endre disse variablene.
                 </p>
-              ) : (
+
                 <button
                   type="submit"
                   className="inline-flex justify-center rounded-md border border-transparent bg-gray-700 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-800 hover:outline focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -651,8 +647,8 @@ export function ExtraVariablesSection(props: {
                 >
                   Lagre
                 </button>
-              )}
-            </div>
+              </div>
+            ) : null}
           </div>
         </Form>
       </div>

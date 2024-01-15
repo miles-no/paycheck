@@ -43,7 +43,6 @@ export async function loader({ params, context, request }: LoaderArgs) {
     user,
   });
 }
-
 export default function Dashboard() {
   const { user, employee } = useLoaderData<typeof loader>();
   return (
@@ -80,14 +79,16 @@ export default function Dashboard() {
             disabled
           />
         </div>
-        <div className={"flex justify-end"}>
-          <a
-            href={`/employees/${user?.employeeDetails?.xledgerId}`}
-            className={"ml-4 p-2  text-sm text-gray-500"}
-          >
-            Endre variabler
-          </a>
-        </div>
+        {user?.role?.name === ("admin" || "manager") ? (
+          <div className={"flex justify-end"}>
+            <a
+              href={`/employees/${user?.employeeDetails?.xledgerId}`}
+              className={"ml-4 p-2  text-sm text-gray-500"}
+            >
+              Endre variabler
+            </a>
+          </div>
+        ) : null}
       </main>
     </>
   );

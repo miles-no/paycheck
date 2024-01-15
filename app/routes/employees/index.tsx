@@ -96,7 +96,7 @@ export default function IndexPage() {
   const maxValue = calcHowManyHoursShouldBeInvoiced(employees);
 
   const totalHoursInvoiced = calcAllHoursInvoiced(employees);
-  const invoicingRate = (totalHoursInvoiced / totalHoursWorked) * 100;
+  const invoicingRate = (totalHoursInvoiced / maxValue) * 100;
 
   return (
     <div>
