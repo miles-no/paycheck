@@ -2,7 +2,7 @@ export function StatBox(props: { label: string; content?: string }) {
   return (
     <div
       className={
-        "overflow-hidden rounded-lg bg-white bg-opacity-50 shadow dark:bg-black dark:bg-opacity-40"
+        "overflow-hidden rounded-lg bg-[#EBFFFD] shadow "
       }
     >
       <div className={"px-4 py-5 sm:p-6"}>

@@ -7,6 +7,8 @@ import { eventNames } from "process";
 import Navbar from "~/components/navbar";
 import { StatBox } from "~/components/statBox";
 import { requireAdminOrManager } from "~/services/user.server";
+import { TimeSheetNav } from "~/components/timeSheetNav";
+
 
 export async function loader({ params, context, request }: LoaderArgs) {
   const user = await requireAdminOrManager(request);
@@ -16,6 +18,9 @@ export async function loader({ params, context, request }: LoaderArgs) {
 
   return json({ metaKey, user });
 }
+const years = "2024";
+const employeeId = "1";
+const months = "1";
 
 
 
@@ -36,17 +41,18 @@ export default function OverviewPage() {
       <main className={"mx-auto flex max-w-7xl flex-col p-10"}>
         <h1
           className={
-            "pt-8 pb-8 text-2xl font-light leading-8 text-gray-900 dark:text-white"
+            "text-3xl font-bold leading-tight text-[#78E8DB]"
           }
         >
           Miles Stavanger
         </h1>
-        <h2 className={"text-2xl font-semibold text-gray-900 dark:text-white"}>
+        <TimeSheetNav employeeId={employeeId} year={years} month={months} />
+        <h2 className={"text-2xl font-semibold text-white"}>
           Hittil denne måneden
         </h2>
         <div className={"mt-8 mb-8"}>
           <div
-            className={"grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"}
+            className={"grid grid-cols-1 gap-5 sm:grid-cols-1 lg:grid-cols-3"}
           >
             <StatBox
               label={"Fakturert"}
@@ -57,7 +63,7 @@ export default function OverviewPage() {
               }).format(100000)}
             />
             <StatBox
-              label={"Lønnsomsetning"}
+              label={"Løønskost"}
               content={Intl.NumberFormat("no-NO", {
                 style: "currency",
                 currency: "NOK",
@@ -75,29 +81,7 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        <div className="hideInPrint">
-          <h2>Lenker</h2>
-          <p className={"text-gray-500 dark:text-gray-400"}>
-            Hint: bruk <kbd>{metaKey}</kbd> + <kbd>K</kbd> for å åpne
-            kommandopanelet eller trykk på søkeknappen nede til høyre.
-          </p>
-          {/*    Let's show some links to things to do, like see employees, search etc*/}
-          <div className={"mt-4"}>
-            <div
-              className={"grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"}
-            >
-              <p>
-                <NavLink
-                  to={"/employees"}
-                  className={"flex rounded border p-2"}
-                >
-                  <UsersIcon className={"h-6 w-6"} />
-                  <span className={"ml-2"}>Se ansatte</span>
-                </NavLink>
-              </p>
-            </div>
-          </div>
-        </div>
+        
       </main>
     </>
   );
