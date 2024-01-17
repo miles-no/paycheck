@@ -153,16 +153,18 @@ export default function MonthlyTimesheetPage() {
   );
 
   const totalHoursWorked = Object.values(totalByProject || {}).reduce(
-    (acc, cur) => acc + cur.hours.worked,
+    (acc, cur) => acc + cur?.hours?.worked || 0,
     0,
   );
 
   const totalHoursInvoiced = Object.values(totalByProject || {}).reduce(
-    (acc, cur) => acc + cur.hours.invoiced,
+    (acc, cur) => acc + cur?.hours?.invoiced || 0,
     0,
   );
   const isAdmin = user.role.name === ("admin" || "manager");
   const maxValue = 172.5;
+  const invoicingRate =
+    totalHoursInvoiced !== null ? (totalHoursInvoiced / maxValue) * 100 : 0;
   return (
     <>
       <Navbar
@@ -179,10 +181,15 @@ export default function MonthlyTimesheetPage() {
           totalHoursWorked={totalHoursWorked}
           totalHoursInvoiced={totalHoursInvoiced}
           monthlyPay={monthlyPay}
-          maxValue = {maxValue}
+          maxValue={maxValue}
           isAdmin={false}
         />
-        <div className="bg-[#EBFFFD] px-4 pt-8 pb-8 dark:bg-black dark:bg-opacity-10 sm:px-6 lg:px-8 rounded-lg">
+        <div className="w-full -mt-8">
+          <h3 className="text-white ">
+            Faktureringsgrad {invoicingRate?.toFixed(0)} %{" "}
+          </h3>
+        </div>
+        <div className="bg-[#EBFFFD] px-4 pt-8 pb-8 dark:bg-black dark:bg-opacity-10 sm:px-6 lg:px-8 rounded-lg mt-4">
           <div className="sm:flex sm:items-center"></div>
           <div className={"-mx-4 mt-8 flow-root sm:mx-0"}>
             <table className={"min-w-full divide-y divide-gray-300"}>
@@ -259,8 +266,7 @@ export default function MonthlyTimesheetPage() {
                               style: "decimal",
                               maximumFractionDigits: 2,
                             }).format(hours.worked)}{" "}
-                            *{" "}
-                            {rate?.toLocaleString("nb-NO")}
+                            * {rate?.toLocaleString("nb-NO")}
                             <br />
                           </p>
                         </td>
@@ -336,7 +342,7 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0 "
                   }
                 >
-                  -{monthlyPay?.invoicedAmount.toLocaleString("nb-NO")}
+                  -{monthlyPay?.selfCost.toLocaleString("nb-NO")}
                 </div>
               </div>
 
@@ -354,7 +360,9 @@ export default function MonthlyTimesheetPage() {
                     "pl-3 pr-4 pt-4 text-right text-sm text-gray-500 md:pr-0"
                   }
                 >
-                  {monthlyPay?.invoicedAmount.toLocaleString("nb-NO")}
+                  {(
+                    monthlyPay?.invoicedAmount - monthlyPay?.selfCost
+                  ).toLocaleString("nb-NO")}
                 </div>
               </div>
 
@@ -420,7 +428,7 @@ export default function MonthlyTimesheetPage() {
               <div className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 sm:pl-0">
                 Andre aktiviteter
               </div>
-              <div className ="flex flex-col  mr-10 lg:items-end" >
+              <div className="flex flex-col  mr-10 lg:items-end">
                 <div className={"flex flex-row lg:w-1/4 justify-between"}>
                   <div
                     className={

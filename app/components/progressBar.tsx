@@ -22,7 +22,6 @@ export function ProgressBar(props: {
   const percentageProgress =
     ((totalHoursWorked != null ? totalHoursWorked : 1) / maxHours) * 100;
   const pay = (monthlyPay as { pay?: number }).pay;
-
   return (
     <div className={"w-full h-24"}>
       <div className="flex flex-row justify-between text-white ">
@@ -30,7 +29,7 @@ export function ProgressBar(props: {
           <p className="flex flex-row whitespace-nowrap">
             {isAdmin ? "Det er ført" : "Du har ført"} &nbsp;
             <div className="text-[#78E8DB] ">
-              {totalHoursInvoiced.toLocaleString("nb-NO")}{" "}
+              {totalHoursWorked.toLocaleString("nb-NO")}{" "}
             </div>{" "}
             &nbsp; av {maxHours.toLocaleString("nb-NO")} timer denne måneden
           </p>

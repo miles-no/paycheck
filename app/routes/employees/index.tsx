@@ -40,7 +40,7 @@ export default function IndexPage() {
   const years = "2024";
   const employeeId = "1";
   const months = "1";
-  const someNumber = 10000;
+  const someNumber = 20000;
 
   const calcRemaining = (hoursWorked: number) => {
     if (!hoursWorked) {
