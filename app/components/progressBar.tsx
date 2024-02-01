@@ -26,16 +26,16 @@ export function ProgressBar(props: {
     <div className={"w-full h-24"}>
       <div className="flex flex-row justify-between text-white ">
         <div>
-          <p className="flex flex-row whitespace-nowrap">
+          <div className="flex flex-row whitespace-nowrap">
             {isAdmin ? "Det er ført" : "Du har ført"} &nbsp;
             <div className="text-[#78E8DB] ">
-              {totalHoursWorked.toLocaleString("nb-NO")}{" "}
+              {totalHoursInvoiced.toLocaleString("nb-NO")}{" "}
             </div>{" "}
             &nbsp; av {maxHours.toLocaleString("nb-NO")} timer denne måneden
-          </p>
+          </div>
         </div>
         <div>
-          <p className="flex flex-row whitespace-nowrap">
+          <div className="flex flex-row whitespace-nowrap">
             {" "}
             Totalt &nbsp;
             <div className="text-[#78E8DB] ">
@@ -45,7 +45,7 @@ export function ProgressBar(props: {
                 maximumFractionDigits: 2,
               }).format(pay)}{" "}
             </div>
-          </p>
+          </div>
         </div>
       </div>
 

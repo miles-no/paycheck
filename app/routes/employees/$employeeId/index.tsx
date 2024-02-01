@@ -502,7 +502,6 @@ export function ExtraVariablesSection(props: {
   isSubmitting: boolean;
 }) {
   const { employee, isSubmitting, disabled } = props;
-  console.log("asdf", disabled)
   return (
     <div className="w-full bg-[#EBFFFD] px-4 py-5 dark:bg-opacity-10 sm:p-6 rounded-md shadow">
       <div className="mt-5 md:col-span-2 md:mt-0 w-full ">

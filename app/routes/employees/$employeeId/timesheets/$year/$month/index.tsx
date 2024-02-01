@@ -26,6 +26,7 @@ import { aggregateProjectSummary } from "~/utils/aggregateProjectSummary.server"
 import type { ErrorResponse } from "@remix-run/router";
 import { calculateMonthlyPayFromSubTotal } from "~/utils/calculateMonthlyPayFromTimesheet";
 import { ProgressBar } from "~/components/progressBar";
+import { getHowManyDaysInAMonth } from "~/utils/getHowManyDaysInAMonth";
 
 function getMainProject(
   timesheetQueryResponse: XLedgerGraphQLTimesheetQueryResponse,
@@ -161,8 +162,22 @@ export default function MonthlyTimesheetPage() {
     (acc, cur) => acc + cur?.hours?.invoiced || 0,
     0,
   );
+
+  const listOfNiceThingsToSay = [
+    "Du er en stjerne!",
+    "Du er fantastisk!",
+    "Du er en helt!",
+    "Du er en legende!",
+    "Du er en vinner!",
+    "Du fortjener mer lønn!",
+  ];
+
+  const randomIndex = Math.floor(Math.random() * listOfNiceThingsToSay.length);
+  const niceThingToSay = listOfNiceThingsToSay[randomIndex];
+
   const isAdmin = user.role.name === ("admin" || "manager");
-  const maxValue = 172.5;
+  const howManyDays = getHowManyDaysInAMonth(Number(year), Number(month));
+  const maxValue = howManyDays * 7.5;
   const invoicingRate =
     totalHoursInvoiced !== null ? (totalHoursInvoiced / maxValue) * 100 : 0;
   return (
@@ -184,6 +199,14 @@ export default function MonthlyTimesheetPage() {
           maxValue={maxValue}
           isAdmin={false}
         />
+        {user?.name === "Henry Sjøen" ||
+        user?.name === "Kristoffer Marthinsen" ? (
+          <div className="mx-auto">
+            <h1 className="henry">{niceThingToSay}</h1>
+          </div>
+        ) : (
+          <></>
+        )}
         <div className="w-full -mt-8">
           <h3 className="text-white ">
             Faktureringsgrad {invoicingRate?.toFixed(0)} %{" "}

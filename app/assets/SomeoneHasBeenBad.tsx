@@ -14,7 +14,7 @@ const SomeoneHasBeenBad = () => {
       <path
         d="M1.86328 20.875V11.5M1.86328 11.5V1.5H17.1072L12.0259 6.5L17.1072 11.5H1.86328Z"
         stroke="#BB2525"
-        stroke-width="3"
+        strokeWidth="3"
       />
     </svg>
   );

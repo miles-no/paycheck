@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import UpOrDown from "~/assets/UpOrDown";
 import { TimeSheetNav } from "~/components/timeSheetNav";
 import SomeoneHasBeenBad from "~/assets/SomeoneHasBeenBad";
+import { getHowManyDaysInAMonth } from "~/utils/getHowManyDaysInAMonth";
 
 export async function loader({ params, context, request }: LoaderArgs) {
   const user = await requireAdminOrManager(request);
@@ -75,7 +76,7 @@ export default function IndexPage() {
   const calcHowManyHoursShouldBeInvoiced = (employees: any) => {
     let total = 0;
     employees.forEach((employee: any) => {
-      total += 172.5;
+      total += thisManyHours;
     });
     return total;
   };
@@ -92,6 +93,9 @@ export default function IndexPage() {
   };
 
   const totalHoursWorked = calcAllHoursWorked(employees);
+  const howManyDays = getHowManyDaysInAMonth(Number(year), Number(month));
+
+  const thisManyHours = howManyDays * 7.5;
 
   const maxValue = calcHowManyHoursShouldBeInvoiced(employees);
 
