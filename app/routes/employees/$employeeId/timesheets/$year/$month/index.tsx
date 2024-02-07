@@ -199,8 +199,7 @@ export default function MonthlyTimesheetPage() {
           maxValue={maxValue}
           isAdmin={false}
         />
-        {user?.name === "Henry Sjøen" ||
-        user?.name === "Kristoffer Marthinsen" ? (
+        {user?.name === "Henry Sjøen" ? (
           <div className="mx-auto">
             <h1 className="henry">{niceThingToSay}</h1>
           </div>
